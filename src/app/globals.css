@@ -197,6 +197,147 @@ body::after {
     76% 0;
 }
 
+/* ============================================================
+   React Bits: GlitchText (https://reactbits.dev, Apache-2.0)
+   Текст-«сбой» с кровавым и ржавым призраками.
+   ============================================================ */
+
+.rb-glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.rb-glitch--on::before,
+.rb-glitch--on::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rb-glitch--on::before {
+  color: var(--glitch-before, #6b4a24);
+  animation: rb-glitch-anim var(--before-duration, 1s) infinite linear
+    alternate-reverse;
+}
+
+.rb-glitch--on::after {
+  color: var(--glitch-after, #b8121a);
+  animation: rb-glitch-anim var(--after-duration, 1.5s) infinite linear
+    alternate-reverse;
+}
+
+@keyframes rb-glitch-anim {
+  0% {
+    clip-path: inset(50% 0 50% 0);
+    transform: translate(0, 0);
+  }
+  10% {
+    clip-path: inset(15% 0 75% 0);
+    transform: translate(-2px, -1px);
+  }
+  20% {
+    clip-path: inset(80% 0 5% 0);
+    transform: translate(2px, 1px);
+  }
+  30% {
+    clip-path: inset(30% 0 60% 0);
+    transform: translate(-1px, 0);
+  }
+  40% {
+    clip-path: inset(60% 0 25% 0);
+    transform: translate(1px, 0);
+  }
+  50% {
+    clip-path: inset(40% 0 45% 0);
+    transform: translate(0, 0);
+  }
+  60% {
+    clip-path: inset(10% 0 82% 0);
+    transform: translate(-1px, 1px);
+  }
+  70% {
+    clip-path: inset(70% 0 15% 0);
+    transform: translate(1px, -1px);
+  }
+  80% {
+    clip-path: inset(45% 0 40% 0);
+    transform: translate(0, 0);
+  }
+  90% {
+    clip-path: inset(25% 0 65% 0);
+    transform: translate(-1px, 0);
+  }
+  100% {
+    clip-path: inset(55% 0 35% 0);
+    transform: translate(1px, 0);
+  }
+}
+
+/* Вариант «только по наведению»: покой без сбоя */
+.rb-glitch--hover::before,
+.rb-glitch--hover::after {
+  display: none;
+}
+
+.rb-glitch--hover:hover::before,
+.rb-glitch--hover:hover::after {
+  display: block;
+  animation: rb-glitch-anim var(--before-duration, 1s) infinite linear
+    alternate-reverse;
+}
+
+/* ============================================================
+   React Bits: SpotlightCard (https://reactbits.dev, Apache-2.0)
+   Световое пятно-фонарик за курсором по карточке.
+   ============================================================ */
+
+.rb-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Пятно рисуется псевдоэлементом — отдельный DOM-узел не нужен */
+.rb-spotlight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--spotlight-size, 340px);
+  height: var(--spotlight-size, 340px);
+  border-radius: 999px;
+  transform: translate(
+    calc(var(--mouse-x, 0px) - 50%),
+    calc(var(--mouse-y, 0px) - 50%)
+  );
+  /* По умолчанию пятно спрятано: показывается только под курсором */
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    var(--spotlight-color, rgba(184, 18, 26, 0.16)) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* На устройствах с мышью пятно живое; на тач-устройствах скрыто */
+@media (hover: hover) and (pointer: fine) {
+  .rb-spotlight:hover::before {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-spotlight::before {
+    display: none;
+  }
+}
+
 /* --- Мерцающая лампа ---
    Имитация агонии лампочки в коридоре. Только opacity/transform. */
 @keyframes lamp-flicker {

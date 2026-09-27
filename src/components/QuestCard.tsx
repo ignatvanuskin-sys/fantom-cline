@@ -1,5 +1,6 @@
 "use client";
 
+import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import type { Quest } from "@/data/quests";
 
 /**
@@ -20,6 +21,13 @@ export default function QuestCard({
 }) {
   return (
     <article className="group relative h-full">
+      {/* React Bits: SpotlightCard — за курсором идёт кровавое пятно,
+          будто карточку подсвечивают фонариком в тёмном коридоре */}
+      <SpotlightCard
+        className="h-full"
+        spotlightColor="rgba(184, 18, 26, 0.14)"
+        spotlightSize={420}
+      >
       <div
         className="relative flex h-full flex-col overflow-hidden border border-iron bg-smoke transition-all duration-500 hover:border-blood-700/60 hover:shadow-[0_0_50px_-12px_rgba(138,3,3,0.55)]"
         style={{ animationDelay: `${index * 60}ms` }}
@@ -131,6 +139,7 @@ export default function QuestCard({
           </div>
         </div>
       </div>
+      </SpotlightCard>
     </article>
   );
 }

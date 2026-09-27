@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ShaderBackground } from "@/components/ui/gem-smoke-diamond";
+import ClickSpark from "@/components/reactbits/ClickSpark";
+import DecryptedText from "@/components/reactbits/DecryptedText";
+import GlitchText from "@/components/reactbits/GlitchText";
+import GradualBlur from "@/components/reactbits/GradualBlur";
 import { BUSINESS } from "@/data/quests";
 
 /**
@@ -139,7 +143,14 @@ export default function Hero() {
             titleIn ? "opacity-100" : "opacity-0"
           }`}
         >
-          Хоррор-квест · {BUSINESS.city}
+          {/* React Bits: GlitchText — подпись «сбоит», как плохой сигнал */}
+          <GlitchText
+            text={`Хоррор-квест · ${BUSINESS.city}`}
+            speed={0.14}
+            className="text-dim-text"
+          >
+            Хоррор-квест · {BUSINESS.city}
+          </GlitchText>
         </p>
 
         {/* Заголовок — по буквам, с дрожанием */}
@@ -170,30 +181,47 @@ export default function Hero() {
           }`}
           style={{ transitionDelay: "700ms" }}
         >
-          Дверь закроется. Свет погаснет. Обратного пути не будет — 60 минут,
-          чтобы выбраться.
+          {/* React Bits: DecryptedText — текст «декодируется» из шума,
+              будто вскрывают повреждённый файл изнутри квеста */}
+          <DecryptedText
+            text="Дверь закроется. Свет погаснет. Обратного пути не будет — 60 минут, чтобы выбраться."
+            startDelay={1100}
+            revealDuration={900}
+            speed={26}
+          />
         </p>
 
         <div
-          className={`mt-9 flex w-full flex-col gap-3 transition-opacity duration-1000 sm:w-auto sm:flex-row ${
+          className={`mt-9 flex w-full flex-col items-stretch gap-3 transition-opacity duration-1000 sm:w-auto sm:flex-row ${
             titleIn ? "opacity-100" : "opacity-0"
           }`}
           style={{ transitionDelay: "900ms" }}
         >
-          <a
-            href="#quests"
-            className="group tap-target relative inline-flex items-center justify-center overflow-hidden bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors duration-300 hover:bg-blood-500"
+          {/* React Bits: ClickSpark — из точки клика разлетаются искры,
+              как от удара в запертую дверь */}
+          <ClickSpark
+            sparkColor="#d33a3f"
+            sparkRadius={18}
+            sparkCount={9}
           >
-            <span className="relative z-10">Войти, если осмелишься</span>
-            {/* «проявление из тумана» при hover */}
-            <span className="absolute inset-0 origin-bottom scale-y-0 bg-blood-900 transition-transform duration-500 ease-out group-hover:scale-y-100" />
-          </a>
-          <a
-            href="#booking"
-            className="tap-target inline-flex items-center justify-center border border-iron px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-dim-text transition-colors duration-300 hover:border-blood-700 hover:text-ash-text"
-          >
-            Выбрать время
-          </a>
+            <a
+              href="#quests"
+              className="group tap-target relative flex items-center justify-center overflow-hidden bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors duration-300 hover:bg-blood-500"
+            >
+              <span className="relative z-10">Войти, если осмелишься</span>
+              {/* «проявление из тумана» при hover */}
+              <span className="absolute inset-0 origin-bottom scale-y-0 bg-blood-900 transition-transform duration-500 ease-out group-hover:scale-y-100" />
+            </a>
+          </ClickSpark>
+
+          <ClickSpark sparkColor="#6b4a24" sparkRadius={12} sparkCount={6}>
+            <a
+              href="#booking"
+              className="tap-target flex items-center justify-center border border-iron px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-dim-text transition-colors duration-300 hover:border-blood-700 hover:text-ash-text"
+            >
+              Выбрать время
+            </a>
+          </ClickSpark>
         </div>
 
         <div
@@ -209,6 +237,10 @@ export default function Hero() {
           <span className="h-10 w-px bg-gradient-to-b from-blood-700 to-transparent" />
         </div>
       </div>
+
+      {/* React Bits: GradualBlur — низ экрана уходит в темноту,
+          переход к следующей секции без жёсткой линии */}
+      <GradualBlur position="bottom" height="10rem" divCount={9} />
     </section>
   );
 }

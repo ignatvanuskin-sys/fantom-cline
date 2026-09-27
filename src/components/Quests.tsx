@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import CountUp from "@/components/reactbits/CountUp";
 import type { Quest } from "@/data/quests";
-import { QUESTS } from "@/data/quests";
+import { BUSINESS, QUESTS } from "@/data/quests";
 import QuestCard from "./QuestCard";
 import QuestModal from "./QuestModal";
 import Reveal from "./Reveal";
@@ -81,6 +82,35 @@ export default function Quests() {
         <p className="mt-2 text-center text-[11px] uppercase tracking-[0.25em] text-faint-text sm:hidden">
           ← листайте в сторону →
         </p>
+
+        {/* Статистика. React Bits: CountUp — числа «накручиваются», когда
+            блок попадает в экран. Данные реальные (2ГИС), см. README. */}
+        <Reveal delay={120} className="mt-14 sm:mt-16">
+          <dl className="grid grid-cols-2 gap-px border border-iron bg-iron sm:grid-cols-4">
+            {[
+              { label: "Квест-комнат", value: QUESTS.length },
+              { label: "Минут на игру", value: 60 },
+              { label: "Оценок", value: BUSINESS.ratingCount },
+              { label: "Отзывов", value: BUSINESS.reviewCount },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="group relative overflow-hidden bg-ash px-4 py-6 text-center transition-colors duration-500 hover:bg-smoke"
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(184,18,26,0.10)_0%,transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                />
+                <dd className="relative font-display text-3xl text-blood-500 sm:text-4xl">
+                  <CountUp to={stat.value} duration={1.6} separator=" " />
+                </dd>
+                <dt className="relative mt-1 text-[10px] uppercase tracking-[0.2em] text-faint-text sm:text-[11px]">
+                  {stat.label}
+                </dt>
+              </div>
+            ))}
+          </dl>
+        </Reveal>
       </div>
 
       <QuestModal quest={active} onClose={() => setActive(null)} />

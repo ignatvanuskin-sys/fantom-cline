@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import ClickSpark from "@/components/reactbits/ClickSpark";
+import GlitchText from "@/components/reactbits/GlitchText";
 import { QUESTS, TIME_SLOTS, type Quest } from "@/data/quests";
 
 /** Ближайшие 14 дней, начиная с завтра (сегодняшний день клиенты не выбирают). */
@@ -173,7 +175,10 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
           className="mt-6 font-display text-lg text-blood-500"
           style={{ animation: "fade-up 0.5s 0.4s both" }}
         >
-          Пути назад нет
+          {/* React Bits: GlitchText — предупреждение сбоит, потом стабилизируется */}
+          <GlitchText text="Пути назад нет" speed={0.5}>
+            Пути назад нет
+          </GlitchText>
         </p>
         <p
           className="mt-2 text-xs text-faint-text"
@@ -440,18 +445,21 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={!canSubmit}
-        className="tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors duration-300 hover:bg-blood-500 disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text"
-      >
-        <span className="relative z-10">
-          {status === "sending" ? "Отправляем…" : "Забронировать место"}
-        </span>
-        {status === "sending" && (
-          <span className="absolute inset-0 -translate-x-full animate-[loading_1.1s_infinite] bg-gradient-to-r from-transparent via-blood-500/40 to-transparent" />
-        )}
-      </button>
+      {/* React Bits: ClickSpark — отправка заявки «высекает искру» */}
+      <ClickSpark sparkColor="#d33a3f" sparkRadius={20} sparkCount={10}>
+        <button
+          type="submit"
+          disabled={!canSubmit}
+          className="tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors duration-300 hover:bg-blood-500 disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text"
+        >
+          <span className="relative z-10">
+            {status === "sending" ? "Отправляем…" : "Забронировать место"}
+          </span>
+          {status === "sending" && (
+            <span className="absolute inset-0 -translate-x-full animate-[loading_1.1s_infinite] bg-gradient-to-r from-transparent via-blood-500/40 to-transparent" />
+          )}
+        </button>
+      </ClickSpark>
 
       <p className="mt-3 text-center text-[11px] leading-relaxed text-faint-text">
         Оплата в кассе после подтверждения администратором. Бронь держим 15 минут.

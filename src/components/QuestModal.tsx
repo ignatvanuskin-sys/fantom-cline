@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import GlitchText from "@/components/reactbits/GlitchText";
 import type { Quest } from "@/data/quests";
 
 /**
@@ -106,7 +107,10 @@ export default function QuestModal({
             id="quest-modal-title"
             className="font-display text-3xl text-ash-text sm:text-4xl"
           >
-            {quest.name}
+            {/* React Bits: GlitchText — название комнаты «сбоит» в момент открытия */}
+            <GlitchText text={quest.name} speed={0.3}>
+              {quest.name}
+            </GlitchText>
           </h3>
           <p className="mt-2 text-sm text-blood-300">{quest.tagline}</p>
 
