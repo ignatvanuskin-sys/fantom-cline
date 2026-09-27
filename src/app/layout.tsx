@@ -76,6 +76,18 @@ export default function RootLayout({
       className={`${horror.variable} ${body.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-void text-ash-text">
+        {/*
+          Ставим `js-ready` синхронно, до первой отрисовки. Пока этого класса
+          нет, CSS не прячет контент (см. .reveal-dark в globals.css) — то есть
+          при любом сбое JS страница остаётся читаемой, а не чёрной.
+          dangerouslySetInnerHTML здесь уместен: это статичный литерал,
+          внешние данные не подставляются.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js-ready')",
+          }}
+        />
         {children}
       </body>
     </html>

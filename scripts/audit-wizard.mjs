@@ -175,8 +175,81 @@ function check(width, label, ok, detail) {
   if (!ok) failures++;
 }
 
+/** Регрессия на «чёрный экран»: весь сайт ниже Hero висит на opacity: 0,
+ *  если клиентский JS не отработал. Проверяем, что секция записи реально
+ *  видима после клика по «Записаться» — то есть ровно то, что делает палец. */
+async function checkBookingVisible(width) {
+  const st = await evaluate(`(() => {
+    const link = [...document.querySelectorAll('a[href*="booking"]')]
+      .find(a => /запис/i.test(a.textContent || ''));
+    if (link) link.click();
+    const form = document.querySelector('#booking form');
+    if (!form) return { err: 'нет формы в #booking' };
+    const reveals = [...document.querySelectorAll('#booking .reveal-dark')];
+    const hidden = reveals.filter(el => parseFloat(getComputedStyle(el).opacity) < 0.05);
+    const wrap = form.closest('.reveal-dark') || form.parentElement;
+    return {
+      hasLink: !!link,
+      jsReady: document.documentElement.classList.contains('js-ready'),
+      formOpacity: parseFloat(getComputedStyle(form).opacity),
+      wrapOpacity: parseFloat(getComputedStyle(wrap).opacity),
+      revealCount: reveals.length,
+      hiddenCount: hidden.length,
+      formVisible: form.getBoundingClientRect().height > 50,
+      scrollY: Math.round(window.scrollY),
+    };
+  })()`);
+  // Скролл по якорю идёт плавно, а reveal срабатывает послеIntersectionObserver.
+  // Замерять раньше ~1.5с — ловить ложный «чёрный экран»: элемент ещё просто
+  // не доехал до экрана. Поэтому ждём и перепроверяем дважды.
+  await sleep(1500);
+  await evaluate("location.hash = 'booking'");
+  await sleep(1500);
+
+  const after = await evaluate(`(() => {
+    const form = document.querySelector('#booking form');
+    if (!form) return { err: 'форма исчезла' };
+    const r = form.getBoundingClientRect();
+    const reveals = [...document.querySelectorAll('#booking .reveal-dark')];
+    const hidden = reveals.filter(el => parseFloat(getComputedStyle(el).opacity) < 0.05);
+    // Размытие держится столько же, сколько opacity, и для пользователя
+    // выглядит так же неприятно, как чёрный экран. Проверяем и его.
+    const blurred = reveals.filter(el => {
+      const m = /blur\\(([\\d.]+)px\\)/.exec(getComputedStyle(el).filter);
+      return m && parseFloat(m[1]) > 0.4;
+    });
+    const wrap = form.closest('.reveal-dark') || form.parentElement;
+    return {
+      scrollY: Math.round(scrollY),
+      onScreen: Math.round(Math.min(r.bottom, innerHeight) - Math.max(r.top, 0)),
+      wrapOpacity: getComputedStyle(wrap).opacity,
+      hiddenCount: hidden.length,
+      blurredCount: blurred.length,
+    };
+  })()`);
+
+  check(width, "секция записи не чёрная (js-ready выставлен)", st?.jsReady === true,
+    `js-ready=${st?.jsReady}`);
+  check(width, "форма записи видима (opacity > 0)", (st?.formOpacity ?? 0) > 0.05,
+    `opacity=${st?.formOpacity}`);
+  check(width, "тап прокручивает к форме", (after?.scrollY ?? 0) > 100,
+    `scrollY=${after?.scrollY}`);
+  check(width, "контейнер формы не скрыт reveal-анимацией", parseFloat(after?.wrapOpacity ?? "0") > 0.05,
+    `opacity=${after?.wrapOpacity}, скрытых reveal=${after?.hiddenCount}`);
+  check(width, "секция записи не размыта", (after?.blurredCount ?? 0) === 0,
+    `размытых reveal=${after?.blurredCount}`);
+  check(width, "форма записи попадает в экран", (after?.onScreen ?? 0) > 100,
+    `на экране ${after?.onScreen}px, scrollY=${after?.scrollY}`);
+}
+
 // ---------- Телефоны: мастер ----------
 for (const width of [320, 375, 414]) {
+  await loadAt(width);
+
+  // Сначала «чёрный экран»: тапаем «Записаться» и убеждаемся, что форма
+  // реально нарисовалась. Проверка идёт первой: если JS не отработал,
+  // все последующие шаги «провалятся» невнятно.
+  await checkBookingVisible(width);
   await loadAt(width);
 
   const s1 = await evaluate(SNAPSHOT);

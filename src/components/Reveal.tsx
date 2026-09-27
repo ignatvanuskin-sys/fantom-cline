@@ -27,6 +27,13 @@ export default function Reveal({
     const el = ref.current;
     if (!el) return;
 
+    // Страховка №1: без IntersectionObserver элемент ждал бы вечно.
+    // Раньше это означало чёрный экран, теперь — обычный видимый контент.
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+
     // IntersectionObserver дешевле и стабильнее, чем scroll-листенеры
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -38,7 +45,19 @@ export default function Reveal({
       { threshold: 0.15, rootMargin: "0px 0px -8% 0px" },
     );
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Страховка №2: даже если наблюдатель «залип» (бывает на старых
+    // мобильных Safari), показываем элемент по таймауту. Пользователь не
+    // должен упираться в пустоту ни при каких обстоятельствах.
+    const failsafe = window.setTimeout(() => {
+      setVisible(true);
+      observer.disconnect();
+    }, 3000);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(failsafe);
+    };
   }, []);
 
   const Tag = as;

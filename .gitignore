@@ -47,3 +47,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# local build artifacts and headless screenshots
+/.build/

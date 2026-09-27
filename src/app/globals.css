@@ -425,22 +425,52 @@ body::after {
   animation: darkness-breathe 9s ease-in-out infinite;
 }
 
-/* --- Появление из темноты --- */
+/* --- Появление из темноты ---
+ *
+ * ВАЖНО: всё «невидимое» начальное состояние (opacity, сдвиг, blur)
+ * применяется ТОЛЬКО при работающем JS — внутри `.js-ready`, который ставит
+ * инлайн-скрипт в <body> до первой отрисовки.
+ *
+ * Раньше `opacity: 0`, `blur(6px)` и `scale(0.985)` стояли безусловно, прямо
+ * в серверном HTML. В итоге любой сбой клиентского JS (ошибка гидрации,
+ * мёртвый бандл, отказ IntersectionObserver, медленный мобильный Safari)
+ * оставлял весь сайт ниже Hero навсегда невидимым и размытым — то есть
+ * чёрный экран вместо страницы. Теперь без JS контент виден и резк сразу:
+ * анимация — улучшение, а не условие показа. */
+
+/* Базовый класс несёт только переход — само скрытие включается ниже. */
 @utility reveal-dark {
-  opacity: 0;
-  transform: translate3d(0, 28px, 0) scale(0.985);
-  filter: blur(6px);
   transition:
     opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
     filter 0.9s ease;
-  will-change: opacity, transform;
+}
+
+/* Скрытое состояние — исключительно при подтверждённом работающем JS.
+   Совпадение по :not гарантирует, что уже показанный элемент не затуманится
+   обратно, даже если класс .js-ready применится позже этой секции. */
+@layer utilities {
+  .js-ready .reveal-dark:not(.reveal-dark-visible) {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0) scale(0.985);
+    filter: blur(6px);
+  }
 }
 
 @utility reveal-dark-visible {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
   filter: blur(0);
+}
+
+/* Страховка от «залипания»: если по какой-то причине класс не проставился
+   (например, IntersectionObserver не сработал), контент обязан быть виден. */
+@media (prefers-reduced-motion: reduce) {
+  .js-ready .reveal-dark:not(.reveal-dark-visible) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
 }
 
 /* Минимальные тач-таргеты 44×44px на мобильных */
