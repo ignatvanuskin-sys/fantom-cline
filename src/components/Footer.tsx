@@ -46,14 +46,16 @@ export default function Footer() {
             </p>
             <ul className="space-y-2 text-sm text-dim-text">
               <li>{BUSINESS.address}</li>
-              <li>
-                <a
-                  href={`tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}`}
-                  className="transition-colors hover:text-blood-300"
-                >
-                  {BUSINESS.phone}
-                </a>
-              </li>
+              {BUSINESS.phone && (
+                <li>
+                  <a
+                    href={`tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}`}
+                    className="transition-colors hover:text-blood-300"
+                  >
+                    {BUSINESS.phone}
+                  </a>
+                </li>
+              )}
               <li>{BUSINESS.hours}</li>
             </ul>
           </div>

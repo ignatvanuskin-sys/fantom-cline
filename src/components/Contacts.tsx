@@ -58,12 +58,22 @@ export default function Contacts() {
                   Телефон
                 </dt>
                 <dd className="mt-1.5">
-                  <a
-                    href={`tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}`}
-                    className="text-lg text-ash-text transition-colors hover:text-blood-300"
-                  >
-                    {BUSINESS.phone}
-                  </a>
+                  {BUSINESS.phone ? (
+                    <a
+                      href={`tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}`}
+                      className="text-lg text-ash-text transition-colors hover:text-blood-300"
+                    >
+                      {BUSINESS.phone}
+                    </a>
+                  ) : (
+                    // TODO: телефон уточняется — пока ведём на запись
+                    <a
+                      href="#booking"
+                      className="text-lg text-blood-300 transition-colors hover:text-blood-500"
+                    >
+                      Записаться онлайн →
+                    </a>
+                  )}
                 </dd>
               </div>
 
@@ -80,6 +90,35 @@ export default function Contacts() {
                   >
                     {BUSINESS.instagram}
                   </a>
+                </dd>
+              </div>
+
+              {/* Рейтинг 2ГИС — реальные данные, подтверждено 27.09.2026 */}
+              <div className="border-t border-iron pt-6">
+                <dt className="text-[11px] uppercase tracking-[0.25em] text-faint-text">
+                  Рейтинг
+                </dt>
+                <dd className="mt-1.5 flex items-center gap-2">
+                  <span aria-hidden="true" className="text-blood-500">
+                    ★
+                  </span>
+                  <span className="text-lg text-ash-text">{BUSINESS.rating}</span>
+                  <span className="text-sm text-faint-text">
+                    {BUSINESS.ratingCount} оценок · {BUSINESS.reviewCount}{" "}
+                    отзывов
+                  </span>
+                </dd>
+              </div>
+
+              <div className="border-t border-iron pt-6">
+                <dt className="text-[11px] uppercase tracking-[0.25em] text-faint-text">
+                  Как добраться
+                </dt>
+                <dd className="mt-1.5 text-sm leading-relaxed text-ash-text/80">
+                  {BUSINESS.addressNote} · {BUSINESS.parking}
+                  <span className="mt-1 block text-dim-text">
+                    Оплата: {BUSINESS.payment}
+                  </span>
                 </dd>
               </div>
             </dl>
