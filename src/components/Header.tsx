@@ -1,8 +1,45 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import SoundToggle from "@/components/horror/SoundToggle";
 import { BUSINESS } from "@/data/quests";
+
+// Инлайновые иконки вместо lucide-react: в проекте нет внешних иконок,
+// а набор тут всего два значка — бургер и крест.
+function MenuIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="18" x2="20" y2="18" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      className="h-5 w-5"
+      aria-hidden="true"
+    >
+      <line x1="5" y1="5" x2="19" y2="19" />
+      <line x1="19" y1="5" x2="5" y2="19" />
+    </svg>
+  );
+}
 
 const NAV = [
   { href: "#quests", label: "Квесты" },
@@ -14,7 +51,6 @@ const NAV = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -23,16 +59,19 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Закрываем меню по Escape, клику вне и при возврате на десктоп —
-  // иначе на телефоне оно осталось бы висеть поверх страницы.
+  // Закрываем меню по Escape и при возврате на десктоп. Клик-вне больше не
+  // нужен: панель занимает весь экран, и тапать мимо неё некуда.
+  // Пока меню открыто, скролл страницы заблокирован — иначе под панелью
+  // прокручивался бы контент, и меню выглядело бы «приклеенным» к нему.
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen) {
+      document.documentElement.style.overflow = "";
+      return;
+    }
 
+    document.documentElement.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMenuOpen(false);
-    };
-    const onPointer = (e: PointerEvent) => {
-      if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false);
     };
     const mq = window.matchMedia("(min-width: 768px)");
     const onChange = () => {
@@ -40,33 +79,33 @@ export default function Header() {
     };
 
     document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPointer);
     mq.addEventListener("change", onChange);
     return () => {
+      document.documentElement.style.overflow = "";
       document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onPointer);
       mq.removeEventListener("change", onChange);
     };
   }, [menuOpen]);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "border-b border-iron bg-void/92 backdrop-blur-md"
-          : "border-b border-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-6">
-        <a
-          href="#hero"
-          aria-label="Fantom — на главную"
-          className="flex min-h-11 items-center font-display text-2xl leading-none text-blood-500 transition-colors hover:text-blood-300"
-        >
-          {BUSINESS.name}
-        </a>
+    <>
+      <header
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? "border-b border-iron bg-void/92 backdrop-blur-md"
+            : "border-b border-transparent"
+        }`}
+      >
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-6">
+          <a
+            href="#hero"
+            aria-label="Fantom — на главную"
+            className="flex min-h-11 items-center font-display text-2xl leading-none text-blood-500 transition-colors hover:text-blood-300"
+          >
+            {BUSINESS.name}
+          </a>
 
-        {/* Навигация только на десктопе — на телефоне её открывают три точки */}
+        {/* Навигация только на десктопе — на телефоне её открывает бургер */}
         <nav aria-label="Основная навигация" className="hidden md:block">
           <ul className="flex items-center gap-7">
             {NAV.map((n) => (
@@ -86,7 +125,6 @@ export default function Header() {
             Раньше это был тонкий контур на прозрачном фоне, и рядом
             с логотипом на телефоне кнопка почти не читалась. */}
         <div className="flex items-center gap-2">
-          <SoundToggle />
           <a
             href="#booking"
             aria-label="Записаться на квест"
@@ -103,86 +141,94 @@ export default function Header() {
             Запись
           </a>
 
-          {/* Три точки — единственный способ попасть в меню на телефоне.
-              Точки складываются в крест при открытии. */}
+          {/* Бургер в квадратной рамке 44×44 — та же метка, что на quest-new-five.
+              Звук из шапки убран: на телефоне он переехал внутрь меню,
+              иначе рядом с логотипом, «Запись» и бургером не оставалось места. */}
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
-            className="tap-target flex items-center gap-[3px] px-1.5 md:hidden"
+            className="tap-target flex h-11 w-11 shrink-0 items-center justify-center border border-ash-text/20 text-ash-text transition-colors hover:border-ash-text/40 md:hidden"
           >
-            <span className="sr-only">Меню</span>
-            <span
-              aria-hidden="true"
-              className={`h-1 w-1 rounded-full bg-ash-text transition-transform duration-300 ${
-                menuOpen ? "translate-y-[3.5px] rotate-45" : ""
-              }`}
-            />
-            <span
-              aria-hidden="true"
-              className={`h-1 w-1 rounded-full bg-ash-text transition-all duration-300 ${
-                menuOpen ? "scale-0 opacity-0" : ""
-              }`}
-            />
-            <span
-              aria-hidden="true"
-              className={`h-1 w-1 rounded-full bg-ash-text transition-transform duration-300 ${
-                menuOpen ? "-translate-y-[3.5px] -rotate-45" : ""
-              }`}
-            />
+            <MenuIcon />
           </button>
         </div>
       </div>
+    </header>
 
-      {/* Панель появляется только после тапа, поэтому навигация
-          не прячется от пользователя с отключённым JS — в футере
-          те же ссылки продублированы статично. */}
-      {menuOpen && (
-        <div
+    {/* Полноэкранная панель. Вынесена из <header> намеренно: у шапки
+        есть backdrop-blur, а он создаёт containing block — оставься
+        внутри, fixed-панель растянулась бы по высоте шапки, а не экрана. */}
+    {menuOpen && (
+      <div
           id="mobile-menu"
-          ref={menuRef}
-          className="border-t border-iron bg-void/98 backdrop-blur-md md:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Меню"
+          className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-void/98 backdrop-blur-xl md:hidden"
         >
-          <nav aria-label="Мобильная навигация" className="px-5">
-            <ul>
-              {NAV.map((n) => (
-                <li key={n.href} className="border-b border-iron/60 last:border-b-0">
-                  <a
-                    href={n.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex min-h-12 items-center text-sm uppercase tracking-[0.16em] text-ash-text/85 transition-colors active:text-blood-300"
-                  >
-                    {n.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <a
-            href="#booking"
-            onClick={() => setMenuOpen(false)}
-            className="flex min-h-12 items-center justify-center bg-blood-700 px-5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text"
-          >
-            Забронировать место
-          </a>
-
-          {/* Телефон у клиента пока не подтверждён (BUSINESS.phone — пустая
-              строка, поэтому проверяем на "" а не на null), ведём на запись. */}
-          <a
-            href={BUSINESS.phone ? `tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}` : "#booking"}
-            onClick={() => setMenuOpen(false)}
-            className="flex min-h-12 items-center justify-center gap-2 border-t border-iron px-5 text-sm text-dim-text"
-          >
-            <span className="text-blood-300" aria-hidden="true">
-              {BUSINESS.phone ? "✆" : "→"}
+          <div className="flex shrink-0 items-center justify-between border-b border-iron px-5 py-3">
+            <span className="text-xs uppercase tracking-[0.24em] text-dim-text">
+              Меню
             </span>
-            {BUSINESS.phone || "Записаться онлайн"}
-          </a>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Закрыть меню"
+              className="tap-target flex h-11 w-11 items-center justify-center border border-ash-text/20 text-ash-text"
+            >
+              <CloseIcon />
+            </button>
+          </div>
+
+          {/* Весь блок скроллится целиком. Без общего скролла на коротком
+              экране (iPhone SE 320×568) нижние элементы не помещались. */}
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+            <nav aria-label="Мобильная навигация" className="px-5 py-4">
+              <ul>
+                {NAV.map((n) => (
+                  <li key={n.href} className="border-b border-iron/60 last:border-b-0">
+                    <a
+                      href={n.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="flex min-h-[52px] items-center font-display text-[clamp(1.45rem,7.6vw,2.2rem)] uppercase leading-tight text-ash-text transition-colors active:text-blood-300"
+                    >
+                      {n.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div className="mt-auto space-y-3 border-t border-iron px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-5">
+              {/* На телефоне звук всегда под рукой в меню, а не в шапке */}
+              <SoundToggle />
+              <a
+                href="#booking"
+                onClick={() => setMenuOpen(false)}
+                className="flex min-h-[56px] items-center justify-center bg-blood-700 px-6 text-sm font-semibold uppercase tracking-[0.16em] text-ash-text transition-colors active:bg-blood-500"
+              >
+                Забронировать место
+              </a>
+
+              {/* Телефон у клиента пока не подтверждён (BUSINESS.phone — пустая
+                  строка, поэтому проверяем на "" а не на null), ведём на запись. */}
+              <a
+                href={BUSINESS.phone ? `tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}` : "#booking"}
+                onClick={() => setMenuOpen(false)}
+                className="flex min-h-12 items-center justify-center gap-2 border border-ash-text/20 px-6 text-xs uppercase tracking-[0.16em] text-dim-text"
+              >
+                <span className="text-blood-300" aria-hidden="true">
+                  {BUSINESS.phone ? "✆" : "→"}
+                </span>
+                {BUSINESS.phone || "Записаться онлайн"}
+              </a>
+            </div>
+          </div>
         </div>
       )}
-    </header>
+    </>
   );
 }

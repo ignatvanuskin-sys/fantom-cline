@@ -105,11 +105,25 @@ const sticky = await evaluate(`(() => {
 })()`);
 console.log("Липких элементов снизу:", JSON.stringify(sticky));
 
+const closedShot = await send("Page.captureScreenshot", { format: "png" });
+writeFileSync(".build/menu-closed.png", Buffer.from(closedShot.result.data, "base64"));
+console.log("меню закрыто: .build/menu-closed.png");
+
 const tapped = await evaluate(`(() => {
   const btn = document.querySelector('button[aria-controls="mobile-menu"]');
   if (!btn) return { found: false };
+  const cs = getComputedStyle(btn);
+  const r = btn.getBoundingClientRect();
+  // Эталон quest-new-five: квадрат 44x44 с рамкой, внутри три линии (svg)
+  const lines = btn.querySelectorAll('svg line').length;
   btn.click();
-  return { found: true, label: btn.getAttribute('aria-label') };
+  return {
+    found: true,
+    label: btn.getAttribute('aria-label'),
+    size: Math.round(r.width) + 'x' + Math.round(r.height),
+    border: cs.borderTopWidth + ' ' + cs.borderTopStyle,
+    lines,
+  };
 })()`);
 await sleep(700);
 
@@ -122,6 +136,12 @@ const panel = await evaluate(`(() => {
   return {
     opened: true,
     expanded: btn.getAttribute('aria-expanded'),
+    role: el.getAttribute('role'),
+    modal: el.getAttribute('aria-modal'),
+    // Панель должна перекрывать весь экран, а не висеть под шапкой
+    coversViewport: Math.abs(r.height - window.innerHeight) < 2,
+    // Пока меню открыто, фон страницы не должен прокручиваться
+    bodyLocked: getComputedStyle(document.documentElement).overflow === 'hidden',
     links: links.map(a => a.textContent.trim()),
     // Каждый пункт должен быть достаточно крупным для пальца
     minLinkH: Math.min(...links.map(a => Math.round(a.getBoundingClientRect().height))),
