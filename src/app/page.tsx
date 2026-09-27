@@ -6,11 +6,14 @@ import Reviews from "@/components/Reviews";
 import Booking from "@/components/Booking";
 import Contacts from "@/components/Contacts";
 import Footer from "@/components/Footer";
-import StickyCTA from "@/components/StickyCTA";
 
 /**
  * Одностраничник с якорными секциями — оптимально для конверсии:
  * посетитель видит комнаты и записывается, не покидая страницу.
+ *
+ * Липкого CTA снизу больше нет: на телефоне он перекрывал нижний
+ * край экрана, конкурировал с «Записью» в шапке и закрывал контент
+ * в момент чтения. Запись остаётся в шапке и в меню с тремя точками.
  */
 export default function Home() {
   return (
@@ -25,7 +28,6 @@ export default function Home() {
         <Contacts />
       </main>
       <Footer />
-      <StickyCTA />
     </>
   );
 }

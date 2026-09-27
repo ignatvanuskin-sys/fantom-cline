@@ -19,7 +19,7 @@ export default function Contacts() {
             id="contacts-title"
             className="font-display text-4xl text-ash-text sm:text-5xl"
           >
-            Где искать
+            Вы почти вышли
           </h2>
         </Reveal>
 

@@ -60,7 +60,8 @@ export default function Quests() {
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-dim-text sm:text-base">
             У каждой комнаты свой уровень страха и свои правила. Начни с
-            безопасной — закончи с той, из которой не все выходят с улыбкой.
+            безопасной — закончи с той, из которой выносят на бодрящих
+            ногах.
           </p>
         </Reveal>
 

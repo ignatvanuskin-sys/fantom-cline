@@ -12,13 +12,13 @@ export default function Reviews() {
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
         <Reveal className="mb-10 text-center sm:mb-14">
           <p className="mb-3 text-[11px] uppercase tracking-[0.35em] text-blood-300">
-            Говорили после игры
+            Говорили, выходя из комнаты
           </p>
           <h2
             id="reviews-title"
             className="font-display text-4xl text-ash-text sm:text-5xl"
           >
-            Что говорят
+            Их уже выпустили
           </h2>
         </Reveal>
 

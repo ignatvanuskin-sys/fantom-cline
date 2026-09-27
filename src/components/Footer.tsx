@@ -13,7 +13,7 @@ const NAV = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-iron bg-void pb-24 pt-14 sm:pb-14 sm:pt-16">
+    <footer className="border-t border-iron bg-void pb-14 pt-14 sm:pb-14 sm:pt-16">
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>

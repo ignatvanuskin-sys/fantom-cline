@@ -32,8 +32,12 @@ export default function HowItWorks() {
             id="how-title"
             className="font-display text-4xl text-ash-text sm:text-5xl"
           >
-            Что будет с тобой
+            Что с тобой будет
           </h2>
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-dim-text sm:text-base">
+            Никто не будет бить по рукам. Но нервы, время и обувь — за
+            счёт заведения.
+          </p>
         </Reveal>
 
         {/* Шаги — на мобильном вертикальный стек, на десктопе 4 колонки */}
