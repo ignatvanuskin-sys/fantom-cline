@@ -6,6 +6,10 @@ import ClickSpark from "@/components/reactbits/ClickSpark";
 import DecryptedText from "@/components/reactbits/DecryptedText";
 import GlitchText from "@/components/reactbits/GlitchText";
 import GradualBlur from "@/components/reactbits/GradualBlur";
+import DotMatrix from "@/components/horror/DotMatrix";
+import GazeEye from "@/components/horror/GazeEye";
+import { BatGlyph, GothicDivider } from "@/components/horror/Gothic";
+import { sfx } from "@/components/horror/SoundToggle";
 import { BUSINESS } from "@/data/quests";
 
 /**
@@ -137,6 +141,29 @@ export default function Hero() {
           />
         ))}
       </div>
+      {/* Взгляд из темноты: два глаза по краям кадра следят за курсором.
+          На тач-устройствах просто смотрят в никуда. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-1/2 hidden -translate-y-1/2 justify-between px-[6%] opacity-70 md:flex"
+      >
+        <GazeEye size={64} className="eye-breathe" />
+        <GazeEye size={64} className="eye-breathe" />
+      </div>
+
+      {/* Табло наблюдения: подпись, будто камера в подвале ведёт запись.
+          Декоративно, но с role=img и подписью — не мешает читалкам. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[13%] hidden -translate-x-1/2 opacity-60 lg:block"
+      >
+        <DotMatrix
+          text="ОБЪЕКТ В СЕТИ"
+          className="h-4 w-auto"
+          color="#8a0303"
+        />
+      </div>
+
       <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-5 text-center sm:px-6">
         <p
           className={`mb-5 text-[11px] uppercase tracking-[0.35em] text-dim-text transition-opacity duration-1000 sm:text-xs ${
@@ -175,6 +202,16 @@ export default function Hero() {
           ))}
         </h1>
 
+        {/* Готический орнамент под логотипом: летучая мышь + розетка */}
+        <div
+          className="mt-5 flex flex-col items-center gap-2"
+          style={{ opacity: titleIn ? 1 : 0, transition: "opacity 1s ease 0.4s" }}
+          aria-hidden="true"
+        >
+          <GothicDivider className="py-0" />
+          <BatGlyph className="h-3 w-6 text-blood-700/60" />
+        </div>
+
         <p
           className={`mt-6 max-w-md text-balance text-base leading-relaxed text-ash-text/85 transition-opacity duration-1000 sm:text-lg ${
             titleIn ? "opacity-100" : "opacity-0"
@@ -206,6 +243,7 @@ export default function Hero() {
           >
             <a
               href="#quests"
+              onClick={() => sfx("door")}
               className="group tap-target relative flex items-center justify-center overflow-hidden bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors duration-300 hover:bg-blood-500"
             >
               <span className="relative z-10">Войти, если осмелишься</span>

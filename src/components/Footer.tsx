@@ -1,3 +1,6 @@
+import DotMatrix from "@/components/horror/DotMatrix";
+import { BatGlyph } from "@/components/horror/Gothic";
+import SoundToggle from "@/components/horror/SoundToggle";
 import { BUSINESS } from "@/data/quests";
 
 const NAV = [
@@ -86,6 +89,20 @@ export default function Footer() {
               {BUSINESS.instagram}
             </a>
           </div>
+        </div>
+
+        {/* Табло наблюдения + готический символ в подвале:
+            последнее, что гость видит перед уходом. */}
+        <div
+          className="mt-10 flex flex-col items-center gap-3 border-t border-iron pt-8"
+          aria-hidden="true"
+        >
+          <DotMatrix text="СИГНАЛ: 06:00" className="h-3.5 w-auto" color="#6b4a24" />
+          <BatGlyph className="h-2.5 w-5 text-blood-900" />
+        </div>
+
+        <div className="mt-6 flex flex-col items-center gap-3">
+          <SoundToggle />
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-iron pt-6 text-xs text-faint-text sm:flex-row sm:items-center sm:justify-between">

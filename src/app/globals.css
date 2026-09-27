@@ -157,6 +157,47 @@ body::after {
   );
 }
 
+/* ============================================================
+   Хоррор-элементы: точечное табло, готика, взгляд
+   ============================================================ */
+
+/* Мерцание живых точек табло — как плохой светодиодный индикатор */
+.dot-matrix-dot {
+  animation: dot-flicker 3.2s linear infinite;
+}
+
+@keyframes dot-flicker {
+  0%, 100% { opacity: 0.92; }
+  17% { opacity: 0.55; }
+  19% { opacity: 0.92; }
+  53% { opacity: 0.7; }
+  55% { opacity: 0.92; }
+  81% { opacity: 0.4; }
+  83% { opacity: 0.92; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot-matrix-dot { animation: none; }
+}
+
+/* Готическая «тень-подпись» под заголовками секций */
+.text-ornate {
+  text-shadow:
+    0 0 24px rgba(184, 18, 26, 0.35),
+    0 1px 0 rgba(0, 0, 0, 0.9);
+}
+
+/* Взгляд из темноты: лёгкое «дрожание» радужки */
+@keyframes eye-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot-matrix-dot,
+  [class*="eye-breathe"] { animation: none; }
+}
+
 /* --- Затемняющие лучи света из темноты ---
    Секции «выходят на свет фонарика» — элемент проявляется
    из тени radial-gradient, как будто подсвечен извне. */

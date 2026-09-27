@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import GlitchText from "@/components/reactbits/GlitchText";
+import { sfx } from "@/components/horror/SoundToggle";
 import type { Quest } from "@/data/quests";
 
 /**
@@ -155,6 +156,8 @@ export default function QuestModal({
             type="button"
             onClick={() => {
               onClose();
+              // Дверь захлопнулась — короткий скример на переходе
+              sfx("sting");
               window.dispatchEvent(
                 new CustomEvent("fantom:book", { detail: { questId: quest.id } }),
               );

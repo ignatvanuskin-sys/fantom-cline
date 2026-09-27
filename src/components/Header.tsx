@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import SoundToggle from "@/components/horror/SoundToggle";
 import { BUSINESS } from "@/data/quests";
 
 const NAV = [
@@ -52,21 +53,27 @@ export default function Header() {
           </ul>
         </nav>
 
-        <a
-          href="#booking"
-          className="tap-target hidden items-center border border-blood-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors hover:bg-blood-700 md:inline-flex"
-        >
-          Записаться
-        </a>
+        {/* Тумблер страшного звука + запись.
+            На мобильном экран тесный, поэтому у «Записи» скрываем текст. */}
+        <div className="flex items-center gap-2">
+          <SoundToggle />
+          <a
+            href="#booking"
+            aria-label="Записаться на квест"
+            className="tap-target hidden items-center border border-blood-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors hover:bg-blood-700 md:inline-flex"
+          >
+            Записаться
+          </a>
 
-        {/* На мобильном — компактная кнопка вместо навигации */}
-        <a
-          href="#booking"
-          aria-label="Записаться на квест"
-          className="tap-target flex items-center border border-blood-700 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors hover:bg-blood-700 md:hidden"
-        >
-          Запись
-        </a>
+          {/* На мобильном — компактная кнопка вместо навигации */}
+          <a
+            href="#booking"
+            aria-label="Записаться на квест"
+            className="tap-target flex items-center border border-blood-700 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors hover:bg-blood-700 md:hidden"
+          >
+            Запись
+          </a>
+        </div>
       </div>
     </header>
   );

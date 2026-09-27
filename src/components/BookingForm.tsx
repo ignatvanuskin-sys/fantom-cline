@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import ClickSpark from "@/components/reactbits/ClickSpark";
 import GlitchText from "@/components/reactbits/GlitchText";
+import { sfx } from "@/components/horror/SoundToggle";
 import { QUESTS, TIME_SLOTS, type Quest } from "@/data/quests";
 
 /** Ближайшие 14 дней, начиная с завтра (сегодняшний день клиенты не выбирают). */
@@ -123,6 +124,8 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
       });
       if (!res.ok) throw new Error("request failed");
       setStatus("done");
+      // Замок щёлкает — заявка принята, дверь закрыта
+      sfx("door");
     } catch {
       setStatus("error");
       setError("Не удалось отправить заявку. Позвоните нам — мы всё примем.");
