@@ -214,9 +214,13 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
       className="overflow-hidden border border-iron bg-smoke p-5 sm:p-8"
     >
       {/* 1. Квест */}
-      <fieldset className="mb-7">
-        <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
-          1 · Какой квест
+        {/* min-w-0 обязателен: у <fieldset> в браузерах стоит
+            min-inline-size: min-content, поэтому горизонтальный ряд
+            дат (14 × 4.5rem) не даёт полю сжаться — на телефоне
+            форма разъезжалась до ~1095px. min-w-0 снимает этот пол. */}
+        <fieldset className="mb-7 min-w-0">
+          <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
+            1 · Какой квест
         </legend>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {QUESTS.map((q) => (
@@ -256,9 +260,9 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
       </fieldset>
 
       {/* 2. Дата — горизонтальный скролл, крупные тач-таргеты */}
-      <fieldset className="mb-7">
-        <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
-          2 · Дата
+        <fieldset className="mb-7 min-w-0">
+          <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
+            2 · Дата
         </legend>
         {/*
           Мобильные: свайп-строка с плавным затуханием по краям.
@@ -315,9 +319,9 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
       </fieldset>
 
       {/* 3. Время — «подсветка доступных слотов фонариком» */}
-      <fieldset className="mb-7">
-        <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
-          3 · Время
+        <fieldset className="mb-7 min-w-0">
+          <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
+            3 · Время
         </legend>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
           {TIME_SLOTS.map((t) => (

@@ -7,7 +7,6 @@ import DecryptedText from "@/components/reactbits/DecryptedText";
 import GlitchText from "@/components/reactbits/GlitchText";
 import GradualBlur from "@/components/reactbits/GradualBlur";
 import DotMatrix from "@/components/horror/DotMatrix";
-import GazeEye from "@/components/horror/GazeEye";
 import { BatGlyph, GothicDivider } from "@/components/horror/Gothic";
 import { sfx } from "@/components/horror/SoundToggle";
 import { BUSINESS } from "@/data/quests";
@@ -141,18 +140,9 @@ export default function Hero() {
           />
         ))}
       </div>
-      {/* Взгляд из темноты: два глаза по краям кадра следят за курсором.
-          На тач-устройствах просто смотрят в никуда. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-1/2 hidden -translate-y-1/2 justify-between px-[6%] opacity-70 md:flex"
-      >
-        <GazeEye size={64} className="eye-breathe" />
-        <GazeEye size={64} className="eye-breathe" />
-      </div>
-
       {/* Табло наблюдения: подпись, будто камера в подвале ведёт запись.
-          Декоративно, но с role=img и подписью — не мешает читалкам. */}
+          Декоративно и только на широких экранах — на телефоне съедало
+          бы место и отвлекало от кнопок. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-[13%] hidden -translate-x-1/2 opacity-60 lg:block"
@@ -180,9 +170,11 @@ export default function Hero() {
           </GlitchText>
         </p>
 
-        {/* Заголовок — по буквам, с дрожанием */}
+        {/* Заголовок — по буквам, с дрожанием.
+            clamp вместо vw: на 320px «FANTOM» рисковал выйти за край,
+            на 430+ был мелковат. */}
         <h1
-          className="font-display text-[22vw] leading-[0.85] text-blood-500 sm:text-[16vw] md:text-[9rem]"
+          className="font-display text-[clamp(2.9rem,21vw,9rem)] leading-[0.85] text-blood-500 sm:text-[16vw] md:text-[9rem]"
           aria-label={BUSINESS.name}
         >
           {letters.map((letter, i) => (
@@ -204,7 +196,7 @@ export default function Hero() {
 
         {/* Готический орнамент под логотипом: летучая мышь + розетка */}
         <div
-          className="mt-5 flex flex-col items-center gap-2"
+          className="mt-4 flex flex-col items-center gap-2 sm:mt-5"
           style={{ opacity: titleIn ? 1 : 0, transition: "opacity 1s ease 0.4s" }}
           aria-hidden="true"
         >
@@ -213,7 +205,7 @@ export default function Hero() {
         </div>
 
         <p
-          className={`mt-6 max-w-md text-balance text-base leading-relaxed text-ash-text/85 transition-opacity duration-1000 sm:text-lg ${
+          className={`mt-5 max-w-md text-balance text-base leading-relaxed text-ash-text/85 transition-opacity duration-1000 sm:mt-6 sm:text-lg ${
             titleIn ? "opacity-100" : "opacity-0"
           }`}
           style={{ transitionDelay: "700ms" }}
@@ -229,7 +221,7 @@ export default function Hero() {
         </p>
 
         <div
-          className={`mt-9 flex w-full flex-col items-stretch gap-3 transition-opacity duration-1000 sm:w-auto sm:flex-row ${
+          className={`mt-7 flex w-full flex-col items-stretch gap-3 transition-opacity duration-1000 sm:mt-9 sm:w-auto sm:flex-row ${
             titleIn ? "opacity-100" : "opacity-0"
           }`}
           style={{ transitionDelay: "900ms" }}
@@ -262,9 +254,11 @@ export default function Hero() {
           </ClickSpark>
         </div>
 
+        {/* Подсказка прокрутки: на невысоких телефонах отступ 16rem
+            съедал экран, поэтому на мобильных он заметно меньше. */}
         <div
           aria-hidden="true"
-          className={`mt-16 flex flex-col items-center gap-2 transition-opacity duration-1000 ${
+          className={`mt-9 flex flex-col items-center gap-2 transition-opacity duration-1000 sm:mt-16 ${
             titleIn ? "opacity-100" : "opacity-0"
           }`}
           style={{ transitionDelay: "1200ms" }}

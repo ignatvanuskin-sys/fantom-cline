@@ -34,7 +34,7 @@ export default function Footer() {
                 <li key={n.href}>
                   <a
                     href={n.href}
-                    className="text-sm text-dim-text transition-colors hover:text-blood-300"
+                    className="-my-1 inline-flex min-h-11 items-center py-1 text-sm text-dim-text transition-colors hover:text-blood-300"
                   >
                     {n.label}
                   </a>

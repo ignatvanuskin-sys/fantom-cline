@@ -120,6 +120,10 @@ html {
   scroll-behavior: smooth;
   /* компенсация под липкий мобильный хедер */
   scroll-padding-top: 5rem;
+  /* Страховка от горизонтального «прыжка»: на телефоне один длинный
+     заголовок или декоративный элемент способны растянуть документ
+     шире экрана, и тогда вся вёрстка уезжает вбось. */
+  overflow-x: clip;
 }
 
 body {
@@ -128,6 +132,18 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* Убираем «резиновый» тап на iOS: без этого страница подпрыгивает
+     при скролле и прокручивается вбок на телефоне. */
+  overscroll-behavior-x: none;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+/* Длинные слова (названия квестов, адреса) не должны вылезать за карточку */
+@media (max-width: 640px) {
+  h1, h2, h3, p, a, li, dd, dt {
+    overflow-wrap: break-word;
+  }
 }
 
 /* --- Film grain поверх всего сайта --- */

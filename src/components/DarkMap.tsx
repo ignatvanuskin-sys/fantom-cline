@@ -51,13 +51,14 @@ export default function DarkMap() {
       }).addTo(map);
 
       // Метка входа. Стандартный icon-ассет не нужен — рисуем круг в CSS,
-      // так не тащим с собой файлы-картинки.
+      // так не тащим с собой файлы-картинки. Размер 44px — чтобы попасть
+      // под палец на телефоне.
       const marker = L.marker([lat, lon], {
         icon: L.divIcon({
           className: "",
           html: `<span class="fantom-pin"></span>`,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15],
+          iconSize: [44, 44],
+          iconAnchor: [22, 22],
         }),
         title: BUSINESS.fullAddress,
         alt: `Вход: ${BUSINESS.fullAddress}`,
@@ -110,7 +111,7 @@ export default function DarkMap() {
         href={BUSINESS.mapUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute left-4 top-4 z-[500] inline-flex items-center gap-2 border border-blood-700/60 bg-void/85 px-3.5 py-2.5 text-[11px] uppercase tracking-[0.15em] text-ash-text backdrop-blur-sm transition-colors hover:border-blood-500 hover:bg-blood-900/70"
+        className="absolute left-4 top-4 z-[500] inline-flex min-h-11 items-center gap-2 border border-blood-700/60 bg-void/85 px-3.5 py-2.5 text-[11px] uppercase tracking-[0.15em] text-ash-text backdrop-blur-sm transition-colors hover:border-blood-500 hover:bg-blood-900/70"
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path
@@ -153,11 +154,16 @@ export default function DarkMap() {
         .leaflet-tile-pane {
           filter: grayscale(0.75) invert(0.92) brightness(0.82) contrast(1.12);
         }
-        /* Контролы в тоне темы */
+        /* Кнопки зума Leaflet: стандартные 30×30 маловаты для пальца.
+           Увеличиваем до 44×44, не ломая раскладку панели. */
         .leaflet-control-zoom a {
           background: #0a0a0a;
           color: #c9c9c9;
           border: 1px solid #1c1a19;
+          width: 44px;
+          height: 44px;
+          line-height: 44px;
+          font-size: 18px;
         }
         .leaflet-control-zoom a:hover {
           background: #8a0303;

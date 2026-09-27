@@ -104,7 +104,7 @@ export default function SoundToggle() {
       aria-pressed={enabled}
       aria-label={enabled ? "Выключить страшные звуки" : "Включить страшные звуки"}
       title={enabled ? "Звук включён · клавиша M" : "Звук выключен · клавиша M"}
-      className="inline-flex items-center gap-2 border border-iron px-3 py-2 text-[10px] uppercase tracking-[0.15em] text-dim-text transition-colors hover:border-blood-700 hover:text-ash-text"
+      className="inline-flex min-h-11 items-center gap-2 border border-iron px-3 py-2 text-[10px] uppercase tracking-[0.15em] text-dim-text transition-colors hover:border-blood-700 hover:text-ash-text"
     >
       <svg
         width="15"

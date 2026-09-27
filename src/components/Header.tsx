@@ -32,7 +32,8 @@ export default function Header() {
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-6">
         <a
           href="#hero"
-          className="font-display text-2xl leading-none text-blood-500 transition-colors hover:text-blood-300"
+          aria-label="Fantom — на главную"
+          className="flex min-h-11 items-center font-display text-2xl leading-none text-blood-500 transition-colors hover:text-blood-300"
         >
           {BUSINESS.name}
         </a>
@@ -44,7 +45,7 @@ export default function Header() {
               <li key={n.href}>
                 <a
                   href={n.href}
-                  className="text-xs uppercase tracking-[0.18em] text-dim-text transition-colors hover:text-blood-300"
+                  className="flex min-h-11 items-center text-xs uppercase tracking-[0.18em] text-dim-text transition-colors hover:text-blood-300"
                 >
                   {n.label}
                 </a>

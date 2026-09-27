@@ -45,7 +45,9 @@ export default function Booking() {
             href={BUSINESS.instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blood-300 underline-offset-4 hover:underline"
+            // py-1 + текст даёт тач-таргет ~44px: на телефоне мелкая
+            // ссылка не попадает под палец
+            className="-my-1 inline-flex min-h-11 items-center py-1 text-blood-300 underline-offset-4 hover:underline"
           >
             Напишите нам в Instagram
           </a>

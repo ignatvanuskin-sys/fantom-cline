@@ -41,7 +41,7 @@ export default function Contacts() {
                   href={BUSINESS.mapUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-block text-sm text-blood-300 transition-colors hover:text-blood-500"
+                  className="-my-1.5 mt-0.5 inline-flex min-h-11 items-center py-1.5 text-sm text-blood-300 transition-colors hover:text-blood-500"
                 >
                   Открыть в картах →
                 </a>
@@ -62,7 +62,7 @@ export default function Contacts() {
                   {BUSINESS.phone ? (
                     <a
                       href={`tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}`}
-                      className="text-lg text-ash-text transition-colors hover:text-blood-300"
+                      className="-my-1.5 inline-flex min-h-11 items-center py-1.5 text-lg text-ash-text transition-colors hover:text-blood-300"
                     >
                       {BUSINESS.phone}
                     </a>
@@ -70,7 +70,7 @@ export default function Contacts() {
                     // TODO: телефон уточняется — пока ведём на запись
                     <a
                       href="#booking"
-                      className="text-lg text-blood-300 transition-colors hover:text-blood-500"
+                      className="-my-1.5 inline-flex min-h-11 items-center py-1.5 text-lg text-blood-300 transition-colors hover:text-blood-500"
                     >
                       Записаться онлайн →
                     </a>
@@ -87,7 +87,7 @@ export default function Contacts() {
                     href={BUSINESS.instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-lg text-ash-text transition-colors hover:text-blood-300"
+                      className="-my-1.5 inline-flex min-h-11 items-center py-1.5 text-lg text-ash-text transition-colors hover:text-blood-300"
                   >
                     {BUSINESS.instagram}
                   </a>

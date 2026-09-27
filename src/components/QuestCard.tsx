@@ -67,9 +67,10 @@ export default function QuestCard({
 
         {/* Контент */}
         <div className="flex flex-1 flex-col p-5 sm:p-6">
-          <h3 className="font-display text-2xl leading-tight text-ash-text transition-colors duration-300 group-hover:text-blood-300 sm:text-[1.7rem]">
-            {/* На мобильном крупный акцентный шрифт мелким размером плохо читается,
-                поэтому название всегда дублируется читаемым текстом ниже. */}
+          {/* break-words + hyphens: названия бывают длиннее одной строки
+              (и пока это плейсхолдер «[Название квеста]») — без этого
+              слово вылезает за карточку на узких телефонах. */}
+          <h3 className="hyphens-auto break-words font-display text-2xl leading-tight text-ash-text transition-colors duration-300 group-hover:text-blood-300 sm:break-normal sm:text-[1.7rem]">
             <span className="sr-only">{quest.name}</span>
             <span aria-hidden="true">{quest.name}</span>
           </h3>
