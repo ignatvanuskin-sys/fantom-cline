@@ -124,6 +124,10 @@ export const QUESTS: Quest[] = [
 //  Всё непроверенное осталось плейсхолдером с пометкой TODO.
 // ============================================================================
 
+// Координаты входа — из ссылки 2ГИС (подтверждено клиентом 27.09.2026).
+// 2ГИС отдаёт их в порядке «долгота,широта»: 82.595183, 49.968637
+const GEO = { lon: 82.595183, lat: 49.968637, zoom: 17 };
+
 export const BUSINESS = {
   // Полное название по 2ГИС: «QuestHouse Fantom & KinoLand»
   name: "Fantom",
@@ -134,10 +138,9 @@ export const BUSINESS = {
   addressNote: "цокольный этаж",
   fullAddress:
     "просп. Нурсултана Назарбаева, 50, цокольный этаж, Усть-Каменогорск",
-  // TODO: уточнить Instagram — в 2ГИС ссылка скрыта, в открытых каталогах
-  // встречается @fantom_uka_ (без ведущего подчёркивания). Требует подтверждения.
+  // Instagram подтверждён клиентом 27.09.2026: https://www.instagram.com/fantom_uka_/
   instagram: "@fantom_uka_",
-  instagramUrl: "https://instagram.com/fantom_uka_",
+  instagramUrl: "https://www.instagram.com/fantom_uka_/",
   // TODO: указать телефон. В 2ГИС номер скрыт за кнопкой «Показать телефон»,
   // видна только часть «+7-700-153…». Номер из справочников НЕ подходит:
   // там «Fantom» — это компания по ремонту оргтехники на Назарбаева, 44.
@@ -153,11 +156,12 @@ export const BUSINESS = {
   // 2ГИС: оплата наличными, картой, по QR-коду
   payment: "Наличные, карта, QR-код",
   // Индекс 070018 по 2ГИС
-  mapUrl:
-    "https://2gis.kz/ust-kamenogorsk/firm/70000001112974709",
-  mapEmbed:
-    "https://yandex.ru/map-widget/v1/?text=%D0%A3%D1%81%D1%82%D1%8C-%D0%9A%D0%B0%D0%BC%D0%B5%D0%BD%D0%BE%D0%B3%D0%BE%D1%80%D1%81%D0%BA%2C%20%D0%BF%D1%80%D0%BE%D1%81%D0%BF%D0%B5%D0%BA%D1%82%20%D0%9D%D1%83%D1%80%D1%81%D1%83%D0%BB%D1%82%D0%B0%D0%BD%D0%B0%20%D0%9D%D0%B0%D0%B7%D0%B0%D1%80%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%2C%2050&z=16",
-  geo: { lat: 49.948, lon: 82.628 }, // TODO: уточнить координаты
+  mapUrl: "https://2gis.kz/ust-kamenogorsk/firm/70000001112974709",
+  // Яндекс.Карты: точка по координатам, а не поиск по строке адреса
+  mapEmbed: `https://yandex.ru/map-widget/v1/?ll=${GEO.lon}%2C${GEO.lat}&z=${GEO.zoom}&pt=${GEO.lon}%2C${GEO.lat}%2Cpm2rdm`,
+  // Координаты входа (см. GEO выше)
+  geo: { lat: GEO.lat, lon: GEO.lon },
+  geoZoom: GEO.zoom,
 };
 
 // TODO: заменить на реальные отзывы клиента.
