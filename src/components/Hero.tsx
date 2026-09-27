@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ShaderBackground } from "@/components/ui/gem-smoke-diamond";
 import { BUSINESS } from "@/data/quests";
 
 /**
@@ -72,6 +73,18 @@ export default function Hero() {
       id="hero"
       className="relative flex min-h-[100svh] items-center justify-center overflow-hidden"
     >
+      {/* WebGL-дым (ShaderBackground) — базовый слой темноты.
+          Палитра уже перекрашена под Fantom: уголь / кровь / ржавчина.
+          Сам компонент останавливает рендер вне экрана и при reduced-motion. */}
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 -z-20 transition-opacity duration-100 ${
+          flickerOn ? "opacity-25" : "opacity-100"
+        }`}
+      >
+        <ShaderBackground className="h-full w-full" />
+      </div>
+
       {/* Фон. TODO: заменить на реальное фото/видео комнаты (см. README).
           Сейчас — CSS-градиент, чтобы макет был полностью рабочим. */}
       <div
@@ -81,8 +94,8 @@ export default function Hero() {
         }`}
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,#1a1210_0%,#0d0d0d_45%,#0a0a0a_100%)]" />
-        {/* имитация лампы в конце коридора */}
-        <div className="absolute left-1/2 top-[38%] h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blood-900/25 blur-3xl animate-breathe" />
+        {/* Лампа в конце коридора — с эффектом агонии (мерцает, потом оживает) */}
+        <div className="absolute left-1/2 top-[38%] h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blood-900/30 blur-3xl animate-lamp" />
         {/* пыль/туман — параллакс-слой, медленнее переднего плана */}
         <div className="absolute inset-0 opacity-40 animate-drift bg-[radial-gradient(circle_at_20%_30%,rgba(140,120,110,0.10)_0%,transparent_45%),radial-gradient(circle_at_75%_65%,rgba(120,100,95,0.08)_0%,transparent_40%)]" />
         {/* перспективные линии коридора */}
@@ -96,6 +109,10 @@ export default function Hero() {
               "radial-gradient(ellipse at 50% 45%, black 5%, transparent 62%)",
           }}
         />
+        {/* Кровавые потёки по краям — краска стекает по стене */}
+        <div className="blood-drip absolute inset-0 opacity-40" />
+        {/* Глубокая тень, «съедающая» края кадра */}
+        <div className="animate-darkness absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,transparent_30%,rgba(0,0,0,0.6)_100%)]" />
       </div>
 
       {/* Кровавый след за курсором (desktop only) */}

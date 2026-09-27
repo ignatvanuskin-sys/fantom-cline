@@ -1,4 +1,5 @@
 import { BUSINESS } from "@/data/quests";
+import DarkMap from "./DarkMap";
 import Reveal from "./Reveal";
 
 /** Контакты + встроенная карта. */
@@ -125,15 +126,14 @@ export default function Contacts() {
           </Reveal>
 
           {/* Карта — TODO: уточнить координаты/ссылку */}
-          <Reveal delay={100} className="min-h-[280px] border border-iron sm:min-h-[380px]">
-            <iframe
-              src={BUSINESS.mapEmbed}
-              title={`Карта: ${BUSINESS.fullAddress}`}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="h-full min-h-[280px] w-full grayscale-[0.6] contrast-125 sm:min-h-[380px]"
-              style={{ border: 0 }}
-            />
+          <Reveal
+            delay={100}
+            className="min-h-[280px] border border-iron sm:min-h-[380px]"
+          >
+            {/* Своя тёмная карта (Leaflet) + кнопка «Открыть в 2ГИС».
+                2ГИС запрещает встраивание в iframe (frame-ancestors 'none'),
+                поэтому карта своя, а 2ГИС — источник данных и цель перехода. */}
+            <DarkMap />
           </Reveal>
         </div>
       </div>

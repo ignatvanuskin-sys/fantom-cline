@@ -9,9 +9,16 @@ export default function Booking() {
     <section
       id="booking"
       aria-labelledby="booking-title"
-      className="relative py-20 sm:py-28"
+      className="relative overflow-hidden py-20 sm:py-28"
     >
-      <div className="mx-auto w-full max-w-3xl px-5 sm:px-6">
+      {/* Фоновые слои: тёмный дым + лампа + потёки. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="animate-lamp absolute left-1/2 top-8 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blood-900/20 blur-3xl" />
+        <div className="blood-drip absolute inset-0 opacity-25" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(184,18,26,0.06)_0%,transparent_70%)]" />
+      </div>
+
+      <div className="relative mx-auto w-full max-w-3xl px-5 sm:px-6">
         <Reveal className="mb-10 text-center sm:mb-12">
           <p className="mb-3 text-[11px] uppercase tracking-[0.35em] text-blood-300">
             Онлайн-запись

@@ -201,7 +201,9 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
     <form
       onSubmit={submit}
       noValidate
-      className="border border-iron bg-smoke p-5 sm:p-8"
+      // overflow-hidden: горизонтальные ряды дат/слотов не должны
+      // вылезать за рамку формы ни при какой ширине экрана
+      className="overflow-hidden border border-iron bg-smoke p-5 sm:p-8"
     >
       {/* 1. Квест */}
       <fieldset className="mb-7">
@@ -250,36 +252,57 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
           2 · Дата
         </legend>
-        <div className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-2">
-          {dates.map((d) => (
-            <label
-              key={d.iso}
-              className={`flex min-w-[4.25rem] shrink-0 snap-start cursor-pointer flex-col items-center border px-2 py-2.5 transition-colors ${
-                date === d.iso
-                  ? "border-blood-700 bg-blood-900/20"
-                  : "border-iron hover:border-blood-700/50"
-              }`}
-            >
-              <input
-                type="radio"
-                name="date"
-                value={d.iso}
-                checked={date === d.iso}
-                onChange={() => {
-                  setDate(d.iso);
-                  setTime("");
-                }}
-                className="sr-only"
-              />
-              <span className="text-[10px] uppercase tracking-[0.12em] text-faint-text">
-                {d.weekday}
-              </span>
-              <span className="text-lg font-semibold leading-tight text-ash-text">
-                {d.day}
-              </span>
-              <span className="text-[10px] text-faint-text">{d.date}</span>
-            </label>
-          ))}
+        {/*
+          Мобильные: свайп-строка с плавным затуханием по краям.
+          Десктоп: сетка 7×2 — 14 дней помещаются целиком и ничего
+          не выходит за границы формы (раньше ряд уезжал вбок из-за
+          отрицательного отступа и не помещался по ширине).
+        */}
+        <div className="relative">
+          <div className="-mx-5 flex snap-x snap-mandatory gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-7 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
+            {dates.map((d) => (
+              <label
+                key={d.iso}
+                className={`relative flex min-w-[4.5rem] shrink-0 snap-center cursor-pointer flex-col items-center border py-2.5 transition-colors sm:min-w-0 ${
+                  date === d.iso
+                    ? "border-blood-700 bg-blood-900/20"
+                    : "border-iron hover:border-blood-700/50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="date"
+                  value={d.iso}
+                  checked={date === d.iso}
+                  onChange={() => {
+                    setDate(d.iso);
+                    setTime("");
+                  }}
+                  className="sr-only"
+                />
+                <span className="text-[10px] uppercase tracking-[0.12em] text-faint-text">
+                  {d.weekday}
+                </span>
+                <span className="text-lg font-semibold leading-tight text-ash-text">
+                  {d.day}
+                </span>
+                <span className="text-[10px] text-faint-text">{d.date}</span>
+
+                {/* Отметка выбранного дня — «запертая дверь» */}
+                {date === d.iso && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 bottom-0 h-0.5 bg-blood-500"
+                  />
+                )}
+              </label>
+            ))}
+          </div>
+
+          {/* Подсказка про свайп — только мобильные */}
+          <p className="mt-2 text-center text-[10px] uppercase tracking-[0.2em] text-faint-text sm:hidden">
+            ← листайте даты →
+          </p>
         </div>
       </fieldset>
 

@@ -11,9 +11,19 @@ export default function HowItWorks() {
     <section
       id="how"
       aria-labelledby="how-title"
-      className="relative bg-ash py-20 sm:py-28"
+      className="relative overflow-hidden bg-ash py-20 sm:py-28"
     >
-      <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
+      {/* Фоновые слои: лампа + кровавые потёки. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        {/* мерцающая лампа в глубине секции */}
+        <div className="animate-lamp absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blood-900/20 blur-3xl" />
+        {/* потёки по краям */}
+        <div className="blood-drip absolute inset-0 opacity-30" />
+        {/* «свет фонарика» сверху — секция выходит из темноты */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_45%_at_50%_0%,rgba(184,18,26,0.07)_0%,transparent_70%)]" />
+      </div>
+
+      <div className="relative mx-auto w-full max-w-6xl px-5 sm:px-6">
         <Reveal className="mb-12 text-center sm:mb-16">
           <p className="mb-3 text-[11px] uppercase tracking-[0.35em] text-blood-300">
             Правила выживания
