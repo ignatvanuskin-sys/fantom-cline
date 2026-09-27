@@ -5,6 +5,7 @@ import ClickSpark from "@/components/reactbits/ClickSpark";
 import GlitchText from "@/components/reactbits/GlitchText";
 import { sfx } from "@/components/horror/SoundToggle";
 import { QUESTS, TIME_SLOTS, type Quest } from "@/data/quests";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 /** Ближайшие 14 дней, начиная с завтра (сегодняшний день клиенты не выбирают). */
 function buildDates() {
@@ -40,11 +41,322 @@ function formatPhone(raw: string) {
   return out;
 }
 
+/* ============================================================
+   Подкомпоненты шагов формы
+   Вынесены отдельно, чтобы мастер на телефоне и полная форма
+   на десктопе использовали одну разметку полей (иначе пришлось бы
+   дублировать id и ломать <label for>).
+   ============================================================ */
+
+/** Шаг 1 — выбор квеста. На телефоне это свайп-карусель, а не стопка из 6 карточек. */
+function QuestPicker({
+  questId,
+  onChange,
+  compact,
+}: {
+  questId: string;
+  onChange: (id: string) => void;
+  /** true — горизонтальный свайп (телефон), false — сетка (десктоп). */
+  compact: boolean;
+}) {
+  if (compact) {
+    return (
+      <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {QUESTS.map((q) => (
+          <label
+            key={q.id}
+            className={`flex w-[72vw] shrink-0 snap-center cursor-pointer flex-col border p-4 transition-colors ${
+              questId === q.id
+                ? "border-blood-700 bg-blood-900/15"
+                : "border-iron"
+            }`}
+          >
+            <input
+              type="radio"
+              name="quest"
+              value={q.id}
+              checked={questId === q.id}
+              onChange={() => onChange(q.id)}
+              className="sr-only"
+            />
+            <span className="flex items-start justify-between gap-2">
+              <span className="hyphens-auto break-words font-display text-xl leading-tight text-ash-text">
+                {q.name}
+              </span>
+              <span
+                aria-hidden="true"
+                className={`mt-1 h-3.5 w-3.5 shrink-0 rounded-full border-2 ${
+                  questId === q.id
+                    ? "border-blood-500 bg-blood-500"
+                    : "border-iron"
+                }`}
+              />
+            </span>
+            <span className="mt-2 text-[11px] leading-relaxed text-faint-text">
+              {q.duration} мин · {q.minPlayers}–{q.maxPlayers} чел. · {q.difficulty}/5
+            </span>
+            <span className="mt-auto pt-3 text-base font-semibold text-blood-300">
+              {q.price.toLocaleString("ru-RU")} ₸
+            </span>
+          </label>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      {QUESTS.map((q) => (
+        <label
+          key={q.id}
+          className={`flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-colors ${
+            questId === q.id
+              ? "border-blood-700 bg-blood-900/15"
+              : "border-iron hover:border-blood-700/50"
+          }`}
+        >
+          <input
+            type="radio"
+            name="quest"
+            value={q.id}
+            checked={questId === q.id}
+            onChange={() => onChange(q.id)}
+            className="sr-only"
+          />
+          <span
+            aria-hidden="true"
+            className={`h-2 w-2 shrink-0 rounded-full ${
+              questId === q.id ? "bg-blood-500" : "bg-iron"
+            }`}
+          />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm text-ash-text">{q.name}</span>
+            <span className="block text-[11px] text-faint-text">
+              {q.duration} мин · {q.price.toLocaleString("ru-RU")} ₸
+            </span>
+          </span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
+/** Шаг 2 — дата (14 дней) и время. */
+function WhenPicker({
+  dates,
+  date,
+  time,
+  onDate,
+  onTime,
+}: {
+  dates: { iso: string; day: string; date: string; weekday: string }[];
+  date: string;
+  time: string;
+  onDate: (iso: string) => void;
+  onTime: (t: string) => void;
+}) {
+  return (
+    <>
+      {/* min-w-0 обязателен: у <fieldset> стоит min-inline-size: min-content,
+          и ряд дат не даёт полю сжаться — форма разъезжалась до ~1095px. */}
+      <fieldset className="mb-6 min-w-0">
+        <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
+          Дата
+        </legend>
+        <div className="-mx-5 flex snap-x snap-mandatory gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-7 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
+          {dates.map((d) => (
+            <label
+              key={d.iso}
+              className={`relative flex min-w-[4.5rem] shrink-0 snap-center cursor-pointer flex-col items-center border py-3 transition-colors sm:min-w-0 ${
+                date === d.iso
+                  ? "border-blood-700 bg-blood-900/20"
+                  : "border-iron hover:border-blood-700/50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="date"
+                value={d.iso}
+                checked={date === d.iso}
+                onChange={() => onDate(d.iso)}
+                className="sr-only"
+              />
+              <span className="text-[10px] uppercase tracking-[0.12em] text-faint-text">
+                {d.weekday}
+              </span>
+              <span className="text-lg font-semibold leading-tight text-ash-text">
+                {d.day}
+              </span>
+              <span className="text-[10px] text-faint-text">{d.date}</span>
+              {date === d.iso && (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 bottom-0 h-0.5 bg-blood-500"
+                />
+              )}
+            </label>
+          ))}
+        </div>
+        <p className="mt-2 text-center text-[10px] uppercase tracking-[0.2em] text-faint-text sm:hidden">
+          ← листайте даты →
+        </p>
+      </fieldset>
+
+      <fieldset className="min-w-0">
+        <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
+          Время
+        </legend>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+          {TIME_SLOTS.map((t) => (
+            <label
+              key={t}
+              className={`tap-target flex cursor-pointer items-center justify-center border text-base transition-all duration-300 ${
+                time === t
+                  ? "border-blood-700 bg-blood-700 text-ash-text shadow-[0_0_24px_-6px_rgba(184,18,26,0.9)]"
+                  : "border-iron text-dim-text hover:border-blood-500 hover:bg-blood-900/10 hover:text-ash-text"
+              }`}
+            >
+              <input
+                type="radio"
+                name="time"
+                value={t}
+                checked={time === t}
+                onChange={() => onTime(t)}
+                className="sr-only"
+              />
+              {t}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    </>
+  );
+}
+
+/** Шаг 3 — игроки и контакты. */
+function WhoPicker({
+  quest,
+  players,
+  onPlayers,
+  name,
+  onName,
+  phone,
+  onPhone,
+  nameValid,
+  phoneValid,
+  stack,
+}: {
+  quest: Quest | undefined;
+  players: number;
+  onPlayers: (n: number) => void;
+  name: string;
+  onName: (s: string) => void;
+  phone: string;
+  onPhone: (s: string) => void;
+  nameValid: boolean;
+  phoneValid: boolean;
+  /** true — вертикально (телефон), false — в две колонки (десктоп). */
+  stack: boolean;
+}) {
+  const min = quest?.minPlayers ?? 2;
+  const max = quest?.maxPlayers ?? 8;
+
+  return (
+    <div className={stack ? "space-y-6" : "grid gap-5 sm:grid-cols-2"}>
+      <div>
+        <label
+          htmlFor="players"
+          className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
+        >
+          Игроков
+        </label>
+        <div className="flex items-center border border-iron focus-within:border-blood-700">
+          <button
+            type="button"
+            aria-label="Меньше игроков"
+            disabled={players <= min}
+            onClick={() => onPlayers(Math.max(players - 1, min))}
+            className="tap-target w-14 shrink-0 text-2xl text-dim-text transition-colors active:text-blood-300 disabled:opacity-30"
+          >
+            −
+          </button>
+          <input
+            id="players"
+            type="number"
+            inputMode="numeric"
+            value={players}
+            min={min}
+            max={max}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              if (!Number.isNaN(v)) onPlayers(Math.min(Math.max(v, min), max));
+            }}
+            className="w-full bg-transparent py-4 text-center text-lg font-semibold text-ash-text outline-none"
+          />
+          <button
+            type="button"
+            aria-label="Больше игроков"
+            disabled={players >= max}
+            onClick={() => onPlayers(Math.min(players + 1, max))}
+            className="tap-target w-14 shrink-0 text-2xl text-dim-text transition-colors active:text-blood-300 disabled:opacity-30"
+          >
+            +
+          </button>
+        </div>
+        <p className="mt-1.5 text-[11px] text-faint-text">
+          От {min} до {max} человек
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <label
+            htmlFor="name"
+            className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
+          >
+            Ваше имя
+          </label>
+          <input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => onName(e.target.value)}
+            placeholder="Как к вам обращаться"
+            autoComplete="name"
+            required
+            aria-invalid={name.length > 0 && !nameValid}
+            className="tap-target w-full border border-iron bg-ash px-4 py-4 text-base text-ash-text outline-none transition-colors placeholder:text-faint-text focus:border-blood-700"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="phone"
+            className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
+          >
+            Телефон
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            inputMode="tel"
+            value={phone}
+            onChange={(e) => onPhone(formatPhone(e.target.value))}
+            placeholder="+7 (___) ___-__-__"
+            autoComplete="tel"
+            required
+            aria-invalid={phone.length > 3 && !phoneValid}
+            className="tap-target w-full border border-iron bg-ash px-4 py-4 text-base text-ash-text outline-none transition-colors placeholder:text-faint-text focus:border-blood-700"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export type BookingFormProps = {
   /** Предзаполненный квест (из карточки/модалки) */
   initialQuestId?: string;
 };
-
 export default function BookingForm({ initialQuestId }: BookingFormProps) {
   // useMemo инлайновый — buildDates создаёт новый массив дат
   const dates = useMemo(() => buildDates(), []);
@@ -62,6 +374,11 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
   );
   const [error, setError] = useState<string>("");
 
+  // Номер шага мастера. Актуален только на телефоне: на десктопе форма
+  // показывается целиком и значение игнорируется.
+  const [stepIndex, setStepIndex] = useState(0);
+  const isMobile = useIsMobile();
+
   const quest: Quest | undefined = QUESTS.find((q) => q.id === questId);
 
   // Предзаполнение из модалки квеста
@@ -77,6 +394,9 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         });
         setTime("");
         setStatus("idle");
+        // Квест уже выбран за пользователя — на телефоне сразу показываем
+        // шаг «Когда», чтобы не заставлять подтверждать очевидное
+        setStepIndex(1);
       }
     };
     window.addEventListener("fantom:book", handler);
@@ -203,8 +523,30 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
       </div>
     );
   }
+  /* ---------- Форма ----------
+     Десктоп: все поля на одной странице.
+     Телефон: пошаговый мастер — на маленьком экране пять полей
+     в столбик означали ~1400px прокрутки, почти всё уходило на
+     выбор квеста из шести карточек. Мастер укладывает выбор
+     в три экрана и держит «Далее» под большим пальцем. */
+  const steps = [
+    { key: "quest", label: "Квест" },
+    { key: "when", label: "Когда" },
+    { key: "who", label: "Кто" },
+  ];
+  const step = Math.min(Math.max(stepIndex, 0), steps.length - 1);
+  const isLast = step === steps.length - 1;
 
-  /* ---------- Форма ---------- */
+  // Что уже выбрано — показываем в шапке мастера
+  const chosenDate = dates.find((d) => d.iso === date);
+  const summary = [
+    quest?.name,
+    chosenDate
+      ? `${chosenDate.day} ${chosenDate.date}${time ? `, ${time}` : ""}`
+      : null,
+    `${players} ${players === 1 ? "игрок" : "игрока"}`,
+  ].filter(Boolean);
+
   return (
     <form
       onSubmit={submit}
@@ -213,235 +555,92 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
       // вылезать за рамку формы ни при какой ширине экрана
       className="overflow-hidden border border-iron bg-smoke p-5 sm:p-8"
     >
-      {/* 1. Квест */}
-        {/* min-w-0 обязателен: у <fieldset> в браузерах стоит
-            min-inline-size: min-content, поэтому горизонтальный ряд
-            дат (14 × 4.5rem) не даёт полю сжаться — на телефоне
-            форма разъезжалась до ~1095px. min-w-0 снимает этот пол. */}
-        <fieldset className="mb-7 min-w-0">
-          <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
-            1 · Какой квест
-        </legend>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {QUESTS.map((q) => (
-            <label
-              key={q.id}
-              className={`flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-colors ${
-                questId === q.id
-                  ? "border-blood-700 bg-blood-900/15"
-                  : "border-iron hover:border-blood-700/50"
-              }`}
-            >
-              <input
-                type="radio"
-                name="quest"
-                value={q.id}
-                checked={questId === q.id}
-                onChange={() => changeQuest(q.id)}
-                className="sr-only"
-              />
-              <span
-                aria-hidden="true"
-                className={`h-2 w-2 shrink-0 rounded-full ${
-                  questId === q.id ? "bg-blood-500" : "bg-iron"
-                }`}
-              />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm text-ash-text">
-                  {q.name}
-                </span>
-                <span className="block text-[11px] text-faint-text">
-                  {q.duration} мин · {q.price.toLocaleString("ru-RU")} ₸
-                </span>
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {/* 2. Дата — горизонтальный скролл, крупные тач-таргеты */}
-        <fieldset className="mb-7 min-w-0">
-          <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
-            2 · Дата
-        </legend>
-        {/*
-          Мобильные: свайп-строка с плавным затуханием по краям.
-          Десктоп: сетка 7×2 — 14 дней помещаются целиком и ничего
-          не выходит за границы формы (раньше ряд уезжал вбок из-за
-          отрицательного отступа и не помещался по ширине).
-        */}
-        <div className="relative">
-          <div className="-mx-5 flex snap-x snap-mandatory gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-7 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
-            {dates.map((d) => (
-              <label
-                key={d.iso}
-                className={`relative flex min-w-[4.5rem] shrink-0 snap-center cursor-pointer flex-col items-center border py-2.5 transition-colors sm:min-w-0 ${
-                  date === d.iso
-                    ? "border-blood-700 bg-blood-900/20"
-                    : "border-iron hover:border-blood-700/50"
-                }`}
+      {/* ---------- Шапка мастер: только на телефоне ---------- */}
+      {isMobile && (
+        <div className="mb-6">
+          <div
+            className="mb-4 flex items-center gap-1.5"
+            role="progressbar"
+            aria-valuenow={step + 1}
+            aria-valuemin={1}
+            aria-valuemax={steps.length}
+            aria-label="Шаг записи"
+          >
+            {steps.map((s, i) => (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => setStepIndex(i)}
+                // tap-target: без него полоска-индикатор даёт кнопке высоту
+                // 20px — по пальцу в неё не попасть
+                className="tap-target flex-1 py-2"
+                aria-label={`Шаг ${i + 1}: ${s.label}`}
+                aria-current={i === step ? "step" : undefined}
               >
-                <input
-                  type="radio"
-                  name="date"
-                  value={d.iso}
-                  checked={date === d.iso}
-                  onChange={() => {
-                    setDate(d.iso);
-                    setTime("");
-                  }}
-                  className="sr-only"
-                />
-                <span className="text-[10px] uppercase tracking-[0.12em] text-faint-text">
-                  {d.weekday}
-                </span>
-                <span className="text-lg font-semibold leading-tight text-ash-text">
-                  {d.day}
-                </span>
-                <span className="text-[10px] text-faint-text">{d.date}</span>
+                <span
+                  className={`block h-1 w-full transition-colors ${
+                    i <= step ? "bg-blood-500" : "bg-iron"
+                  }`}
 
-                {/* Отметка выбранного дня — «запертая дверь» */}
-                {date === d.iso && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-0 bottom-0 h-0.5 bg-blood-500"
-                  />
-                )}
-              </label>
+                />
+              </button>
             ))}
           </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="shrink-0 text-[11px] uppercase tracking-[0.25em] text-blood-300">
+              Шаг {step + 1} из {steps.length} · {steps[step].label}
+            </p>
+            <p className="truncate text-[11px] text-faint-text">
+              {summary.join(" · ")}
+            </p>
+          </div>
+        </div>
+      )}
 
-          {/* Подсказка про свайп — только мобильные */}
-          <p className="mt-2 text-center text-[10px] uppercase tracking-[0.2em] text-faint-text sm:hidden">
-            ← листайте даты →
+
+      {/* ---------- Шаг 1: квест ---------- */}
+      {(!isMobile || step === 0) && (
+        <div className="mb-6 min-w-0">
+          <p className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
+            {isMobile ? "" : "1 · "}Какой квест
           </p>
+          <QuestPicker questId={questId} onChange={changeQuest} compact={isMobile} />
         </div>
-      </fieldset>
+      )}
 
-      {/* 3. Время — «подсветка доступных слотов фонариком» */}
-        <fieldset className="mb-7 min-w-0">
-          <legend className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
-            3 · Время
-        </legend>
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-          {TIME_SLOTS.map((t) => (
-            <label
-              key={t}
-              className={`tap-target flex cursor-pointer items-center justify-center border text-sm transition-all duration-300 ${
-                time === t
-                  ? "border-blood-700 bg-blood-700 text-ash-text shadow-[0_0_24px_-6px_rgba(184,18,26,0.9)]"
-                  : "border-iron text-dim-text hover:border-blood-500 hover:bg-blood-900/10 hover:text-ash-text"
-              }`}
-            >
-              <input
-                type="radio"
-                name="time"
-                value={t}
-                checked={time === t}
-                onChange={() => setTime(t)}
-                className="sr-only"
-              />
-              {t}
-            </label>
-          ))}
+      {/* ---------- Шаг 2: дата и время ---------- */}
+      {(!isMobile || step === 1) && (
+        <div className={isMobile ? "" : "mb-6"}>
+          <WhenPicker
+            dates={dates}
+            date={date}
+            time={time}
+            onDate={(iso) => {
+              setDate(iso);
+              setTime("");
+            }}
+            onTime={setTime}
+          />
         </div>
-      </fieldset>
+      )}
 
-      {/* 4. Игроки + 5. Контакты */}
-      <div className="mb-7 grid gap-5 sm:grid-cols-2">
-        <div>
-          <label
-            htmlFor="players"
-            className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
-          >
-            4 · Игроков
-          </label>
-          <div className="flex items-center border border-iron focus-within:border-blood-700">
-            <button
-              type="button"
-              aria-label="Меньше игроков"
-              disabled={players <= (quest?.minPlayers ?? 2)}
-              onClick={() => setPlayers((p) => Math.max(p - 1, quest?.minPlayers ?? 2))}
-              className="tap-target w-12 shrink-0 text-lg text-dim-text transition-colors hover:text-blood-300 disabled:opacity-30"
-            >
-              −
-            </button>
-            <input
-              id="players"
-              type="number"
-              inputMode="numeric"
-              value={players}
-              min={quest?.minPlayers ?? 2}
-              max={quest?.maxPlayers ?? 8}
-              onChange={(e) => {
-                const v = Number(e.target.value);
-                if (!Number.isNaN(v))
-                  setPlayers(
-                    Math.min(
-                      Math.max(v, quest?.minPlayers ?? 2),
-                      quest?.maxPlayers ?? 8,
-                    ),
-                  );
-              }}
-              className="w-full bg-transparent py-3 text-center text-base font-semibold text-ash-text outline-none"
-            />
-            <button
-              type="button"
-              aria-label="Больше игроков"
-              disabled={players >= (quest?.maxPlayers ?? 8)}
-              onClick={() => setPlayers((p) => Math.min(p + 1, quest?.maxPlayers ?? 8))}
-              className="tap-target w-12 shrink-0 text-lg text-dim-text transition-colors hover:text-blood-300 disabled:opacity-30"
-            >
-              +
-            </button>
-          </div>
-          <p className="mt-1.5 text-[11px] text-faint-text">
-            От {quest?.minPlayers} до {quest?.maxPlayers} человек
-          </p>
+      {/* ---------- Шаг 3: игроки и контакты ---------- */}
+      {(!isMobile || step === 2) && (
+        <div className={isMobile ? "" : "mb-6"}>
+          <WhoPicker
+            quest={quest}
+            players={players}
+            onPlayers={setPlayers}
+            name={name}
+            onName={setName}
+            phone={phone}
+            onPhone={setPhone}
+            nameValid={nameValid}
+            phoneValid={phoneValid}
+            stack={isMobile}
+          />
         </div>
-
-        <div className="space-y-4">
-          <div>
-            <label
-              htmlFor="name"
-              className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
-            >
-              5 · Ваше имя
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Как к вам обращаться"
-              autoComplete="name"
-              required
-              aria-invalid={name.length > 0 && !nameValid}
-              className="tap-target w-full border border-iron bg-ash px-4 py-3 text-base text-ash-text outline-none transition-colors placeholder:text-faint-text focus:border-blood-700"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="phone"
-              className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
-            >
-              Телефон
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              inputMode="tel"
-              value={phone}
-              onChange={(e) => setPhone(formatPhone(e.target.value))}
-              placeholder="+7 (___) ___-__-__"
-              autoComplete="tel"
-              required
-              aria-invalid={phone.length > 3 && !phoneValid}
-              className="tap-target w-full border border-iron bg-ash px-4 py-3 text-base text-ash-text outline-none transition-colors placeholder:text-faint-text focus:border-blood-700"
-            />
-          </div>
-        </div>
-      </div>
+      )}
 
       {error && (
         <p
@@ -452,21 +651,63 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         </p>
       )}
 
-      {/* React Bits: ClickSpark — отправка заявки «высекает искру» */}
-      <ClickSpark sparkColor="#d33a3f" sparkRadius={20} sparkCount={10}>
-        <button
-          type="submit"
-          disabled={!canSubmit}
-          className="tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors duration-300 hover:bg-blood-500 disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text"
-        >
-          <span className="relative z-10">
-            {status === "sending" ? "Отправляем…" : "Забронировать место"}
-          </span>
-          {status === "sending" && (
-            <span className="absolute inset-0 -translate-x-full animate-[loading_1.1s_infinite] bg-gradient-to-r from-transparent via-blood-500/40 to-transparent" />
-          )}
-        </button>
-      </ClickSpark>
+      {/* На последнем шаге мастер кнопка отключена, пока форма не готова.
+          Без подсказки это выглядит как сломанная вёрстка — говорим, чего не хватает. */}
+      {isMobile && isLast && !canSubmit && (
+        <p className="mb-3 text-center text-[11px] leading-relaxed text-faint-text">
+          {!time
+            ? "Осталось выбрать время"
+            : !nameValid
+              ? "Осталось указать имя"
+              : !phoneValid
+                ? "Осталось указать телефон"
+                : "Проверьте выбранные данные"}
+        </p>
+      )}
+
+      {/* ---------- Навигация мастером + отправка ---------- */}
+      <div className="mt-7 flex gap-3">
+        {isMobile && step > 0 && (
+          <button
+            type="button"
+            onClick={() => setStepIndex((s) => s - 1)}
+            className="tap-target flex w-28 shrink-0 items-center justify-center border border-iron text-sm font-semibold uppercase tracking-[0.12em] text-dim-text transition-colors active:border-blood-700 active:text-ash-text"
+          >
+            Назад
+          </button>
+        )}
+
+        {isMobile && !isLast ? (
+          <button
+            type="button"
+            onClick={() => setStepIndex((s) => s + 1)}
+            className="tap-target flex flex-1 items-center justify-center bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors active:bg-blood-500"
+          >
+            Далее
+          </button>
+        ) : (
+          /* React Bits: ClickSpark — отправка заявки «высекает искру» */
+          <ClickSpark
+            sparkColor="#d33a3f"
+            sparkRadius={20}
+            sparkCount={10}
+            className="flex-1"
+          >
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className="tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors duration-300 active:bg-blood-500 disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text"
+            >
+              <span className="relative z-10">
+                {status === "sending" ? "Отправляем…" : "Забронировать место"}
+              </span>
+              {status === "sending" && (
+                <span className="absolute inset-0 -translate-x-full animate-[loading_1.1s_infinite] bg-gradient-to-r from-transparent via-blood-500/40 to-transparent" />
+              )}
+            </button>
+          </ClickSpark>
+        )}
+      </div>
 
       <p className="mt-3 text-center text-[11px] leading-relaxed text-faint-text">
         Оплата в кассе после подтверждения администратором. Бронь держим 15 минут.

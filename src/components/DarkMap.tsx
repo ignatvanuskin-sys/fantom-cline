@@ -41,6 +41,9 @@ export default function DarkMap() {
         zoom: BUSINESS.geoZoom ?? 17,
         scrollWheelZoom: false, // не перехватываем прокрутку страницы
         attributionControl: true,
+        // Штатный контрол Leaflet рисует кнопки 30×30 — по пальцу не попасть.
+        // Отключаем его и рисуем свои 44×44 кнопками ниже.
+        zoomControl: false,
       });
       mapRef.current = map;
 
@@ -105,6 +108,28 @@ export default function DarkMap() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-[400] bg-void/35"
       />
+
+      {/* Свои кнопки зума вместо контрола Leaflet: 44×44 под палец.
+          Стилизация на Tailwind, поэтому размер не зависит от каскада
+          сторонних стилей Leaflet. */}
+      <div className="absolute bottom-3 right-3 z-[500] flex flex-col">
+        <button
+          type="button"
+          onClick={() => mapRef.current?.zoomIn()}
+          aria-label="Приблизить карту"
+          className="tap-target flex h-12 w-12 items-center justify-center border border-iron bg-void/90 text-xl leading-none text-dim-text backdrop-blur-sm transition-colors hover:border-blood-500 hover:text-ash-text active:bg-blood-900/70"
+        >
+          +
+        </button>
+        <button
+          type="button"
+          onClick={() => mapRef.current?.zoomOut()}
+          aria-label="Отдалить карту"
+          className="tap-target -mt-px flex h-12 w-12 items-center justify-center border border-iron bg-void/90 text-xl leading-none text-dim-text backdrop-blur-sm transition-colors hover:border-blood-500 hover:text-ash-text active:bg-blood-900/70"
+        >
+          −
+        </button>
+      </div>
 
       {/* Кнопка-ссылка на 2ГИС — основной сценарий для точного маршрута */}
       <a

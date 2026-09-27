@@ -71,7 +71,7 @@ export default function Footer() {
               href={BUSINESS.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-dim-text transition-colors hover:text-blood-300"
+              className="tap-target inline-flex items-center gap-2 text-sm text-dim-text transition-colors hover:text-blood-300"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <rect
