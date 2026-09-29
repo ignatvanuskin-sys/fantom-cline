@@ -95,7 +95,10 @@ export default function QuestCard({
           {/* break-words + hyphens: названия бывают длиннее одной строки
               (и пока это плейсхолдер «[Название квеста]») — без этого
               слово вылезает за карточку на узких телефонах. */}
-          <h3 className="hyphens-auto break-words font-display text-2xl leading-tight text-ash-text transition-colors duration-300 group-hover:text-blood-300 sm:break-normal sm:text-[1.7rem]">
+          {/* Название комнаты — вязь (Ruslan Display), а не «капли»:
+              так у заголовка секции и названия комнаты разные голоса,
+              и гость различает уровни, не читая. */}
+          <h3 className="hyphens-auto break-words font-accent text-2xl leading-tight text-ash-text transition-colors duration-300 group-hover:text-blood-300 sm:break-normal sm:text-[1.7rem]">
             <span className="sr-only">{quest.name}</span>
             <span aria-hidden="true">{quest.name}</span>
           </h3>
