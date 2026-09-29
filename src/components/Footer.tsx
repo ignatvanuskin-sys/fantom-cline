@@ -5,8 +5,6 @@ import { BUSINESS } from "@/data/quests";
 
 const NAV = [
   { href: "#quests", label: "Квесты" },
-  { href: "#gallery", label: "Галерея" },
-  { href: "#video", label: "Видео" },
   { href: "#how", label: "Как проходит" },
   { href: "#reviews", label: "Отзывы" },
   { href: "#booking", label: "Запись" },

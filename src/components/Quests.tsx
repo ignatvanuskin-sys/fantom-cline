@@ -37,7 +37,46 @@ export default function Quests() {
     return () => observer.disconnect();
   }, []);
 
-  const open = useCallback((q: Quest) => setActive(q), []);
+  /**
+   * Открытая комната отражается в адресе: `#quest-<id>`.
+   *
+   * Так ссылку на конкретную комнату можно переслать, а кнопка «назад»
+   * закрывает карточку, а не выбрасывает со страницы. Адрес — источник
+   * правды: при загрузке и при переходах назад/вперёд состояние берётся
+   * из хеша, а не наоборот.
+   */
+  useEffect(() => {
+    const syncFromHash = () => {
+      const id = window.location.hash.replace(/^#quest-/, "");
+      setActive(id ? (QUESTS.find((q) => q.id === id) ?? null) : null);
+    };
+
+    syncFromHash();
+    window.addEventListener("popstate", syncFromHash);
+    window.addEventListener("hashchange", syncFromHash);
+    return () => {
+      window.removeEventListener("popstate", syncFromHash);
+      window.removeEventListener("hashchange", syncFromHash);
+    };
+  }, []);
+
+  const open = useCallback((q: Quest) => {
+    setActive(q);
+    // pushState, а не replaceState: «назад» должна закрывать карточку,
+    // а не листать историю мимо неё. pushState не вызывает скролл к якорю.
+    window.history.pushState({ quest: q.id }, "", `#quest-${q.id}`);
+  }, []);
+
+  const close = useCallback(() => {
+    setActive(null);
+    if (window.location.hash.startsWith("#quest-")) {
+      window.history.pushState(
+        {},
+        "",
+        window.location.pathname + window.location.search,
+      );
+    }
+  }, []);
 
   return (
     <section
@@ -102,7 +141,7 @@ export default function Quests() {
                   aria-hidden="true"
                   className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(184,18,26,0.10)_0%,transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 />
-                <dd className="relative font-display text-3xl text-blood-300 sm:text-4xl">
+                <dd className="tnum relative font-display text-3xl text-blood-300 sm:text-4xl">
                   <CountUp to={stat.value} duration={1.6} separator=" " />
                 </dd>
                 <dt className="relative mt-1 text-[10px] uppercase tracking-[0.2em] text-faint-text sm:text-[11px]">
@@ -114,7 +153,7 @@ export default function Quests() {
         </Reveal>
       </div>
 
-      <QuestModal quest={active} onClose={() => setActive(null)} />
+      <QuestModal quest={active} onClose={close} />
     </section>
   );
 }

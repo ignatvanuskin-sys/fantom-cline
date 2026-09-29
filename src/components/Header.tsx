@@ -81,10 +81,10 @@ function CloseIcon() {
   );
 }
 
+// Четыре пункта вместо шести: «Галерея» и «Видео» ушли вместе с разделами,
+// а короткое меню читается с одного взгляда и влезает в строку.
 const NAV = [
   { href: "#quests", label: "Квесты" },
-  { href: "#gallery", label: "Галерея" },
-  { href: "#video", label: "Видео" },
   { href: "#how", label: "Как проходит" },
   { href: "#reviews", label: "Отзывы" },
   { href: "#contacts", label: "Контакты" },

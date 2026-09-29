@@ -10,7 +10,7 @@ import GradualBlur from "@/components/reactbits/GradualBlur";
 import DotMatrix from "@/components/horror/DotMatrix";
 import { BatGlyph, GothicDivider } from "@/components/horror/Gothic";
 import { sfx } from "@/components/horror/SoundToggle";
-import { HERO_PHOTO } from "@/data/media";
+import { HERO_SCENE } from "@/data/scenes";
 import { BUSINESS } from "@/data/quests";
 
 /**
@@ -107,7 +107,7 @@ export default function Hero() {
       >
         <div className="absolute -inset-[6%] animate-drift">
           <Image
-            src={HERO_PHOTO.src}
+            src={HERO_SCENE.src}
             alt=""
             fill
             priority
@@ -115,8 +115,10 @@ export default function Hero() {
             className="object-cover"
           />
         </div>
-        {/* Гасим кадр: иначе текст заголовка теряется на росписи */}
-        <div className="absolute inset-0 bg-void/72" />
+        {/* Гасим кадр ровно настолько, чтобы коридор читался, но заголовок
+            не тонул в нём: при 72% сцена превращалась в чёрный прямоугольник,
+            и фон работал впустую. */}
+        <div className="absolute inset-0 bg-void/62" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(26,18,16,0.35)_0%,#0d0d0d_55%,#0a0a0a_100%)]" />
         {/* Лампа в конце коридора — с эффектом агонии (мерцает, потом оживает) */}
         <div className="absolute left-1/2 top-[38%] h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blood-900/30 blur-3xl animate-lamp" />
@@ -173,7 +175,10 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-5 text-center sm:px-6">
         <p
-          className={`mb-5 text-[11px] uppercase tracking-[0.35em] text-dim-text transition-opacity duration-1000 sm:text-xs ${
+          // font-glitch — единственное место, где уместна «сбойная»
+          // гарнитура: строка короткая, и она и так дрожит по CSS.
+          // Трекинг снижен с 0.35em: у этой гарнитуры свои широкие пробелы.
+          className={`mb-5 font-glitch text-[11px] uppercase tracking-[0.28em] text-dim-text transition-opacity duration-1000 sm:text-xs ${
             titleIn ? "opacity-100" : "opacity-0"
           }`}
         >
@@ -193,7 +198,10 @@ export default function Hero() {
         <h1
           // blood-300, а не blood-500: главный заголовок лежит на затемнённом
           // фото, и тёмно-красный не дотягивал до 3:1 для крупного текста.
-          className="font-display text-[clamp(2.9rem,21vw,9rem)] leading-[0.85] text-blood-300 sm:text-[16vw] md:text-[9rem]"
+          // Размер подобран под Rubik Wet Paint: он заметно шире прежнего
+          // Creepster, и при 21vw слово «FANTOM» ломалось на две строки.
+          // 6 знаков при 15.5vw занимают ~90% ширины экрана на 320–414px.
+          className="font-display text-[clamp(2.2rem,15.5vw,8rem)] leading-[0.9] text-blood-300 sm:text-[13vw] md:text-[8rem]"
           aria-label={BUSINESS.name}
         >
           {letters.map((letter, i) => (

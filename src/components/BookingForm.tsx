@@ -445,9 +445,31 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!quest) return;
-    if (!nameValid) return setError("Введите имя");
-    if (!phoneValid) return setError("Введите корректный номер телефона");
-    if (!time) return setError("Выберите время");
+
+    /*
+      Кнопка отправки всегда активна, а проверка идёт здесь.
+      Отключённая кнопка — тупик: человек не понимает, чего от него
+      хотят, и не может получить объяснение. Поэтому вместо `disabled`
+      мы даём нажать, показываем, что не так, и переводим фокус
+      в первое проблемное поле — иначе на телефоне придётся искать
+      ошибку глазами по всей форме.
+    */
+    const problem = !nameValid ? "name" : !phoneValid ? "phone" : !time ? "time" : null;
+    if (problem) {
+      setError(
+        problem === "name"
+          ? "Укажите имя — администратор перезвонит и подтвердит бронь."
+          : problem === "phone"
+            ? "Проверьте номер: нужно 11 цифр, начиная с 7."
+            : "Выберите время — свободные слоты обновляются каждый день.",
+      );
+      const field =
+        problem === "time"
+          ? document.querySelector<HTMLInputElement>('input[name="time"]')
+          : document.getElementById(problem);
+      field?.focus();
+      return;
+    }
 
     setError("");
     setStatus("sending");
@@ -571,6 +593,17 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
     `${players} ${players === 1 ? "игрок" : "игрока"}`,
   ].filter(Boolean);
 
+  /*
+    Итог считаем здесь, а не в шапке мастера: там строка обрезается
+    через truncate, и сумма — первое, что от неё отвалится. А знать
+    сумму до отправки важнее, чем видеть её в сводке.
+    Цена в данных — за человека (на карточке подписано «₸ / чел.»),
+    поэтому умножаем на число игроков.
+  */
+  const money = new Intl.NumberFormat("ru-RU");
+  const perPerson = quest ? money.format(quest.price) : null;
+  const total = quest ? money.format(quest.price * players) : null;
+
   return (
     <form
       onSubmit={submit}
@@ -675,8 +708,8 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         </p>
       )}
 
-      {/* На последнем шаге мастер кнопка отключена, пока форма не готова.
-          Без подсказки это выглядит как сломанная вёрстка — говорим, чего не хватает. */}
+      {/* На последнем шаге заранее говорим, чего не хватает: кнопка при
+          этом остаётся активной, но подсказка снимает лишний тап вслепую. */}
       {isMobile && isLast && !canSubmit && (
         <p className="mb-3 text-center text-[11px] leading-relaxed text-faint-text">
           {!time
@@ -687,6 +720,21 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
                 ? "Осталось указать телефон"
                 : "Проверьте выбранные данные"}
         </p>
+      )}
+
+      {/* ---------- Итог ----------
+          Появляется, как только выбрана комната: человек должен понимать,
+          на какую сумму соглашается, ещё до звонка администратора. */}
+      {total && (
+        <div className="mt-6 flex items-baseline justify-between gap-3 border-t border-iron pt-4">
+          <span className="tnum text-[11px] uppercase tracking-[0.2em] text-faint-text">
+            Итого · {players} × {perPerson} ₸
+          </span>
+          <span className="tnum font-display text-2xl text-blood-300">
+            {total}
+            <span className="ml-1 text-base text-ash-text">₸</span>
+          </span>
+        </div>
       )}
 
       {/* ---------- Навигация мастером + отправка ---------- */}
@@ -719,7 +767,9 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
           >
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={status === "sending"}
+              aria-busy={status === "sending"}
+              aria-disabled={!canSubmit}
               className="tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,transform,box-shadow] duration-200 hover:bg-blood-500 focus-visible:shadow-[0_0_0_3px_rgba(184,18,26,0.28)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text disabled:active:scale-100"
             >
               <span className="relative z-10">

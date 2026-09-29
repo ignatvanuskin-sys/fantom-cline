@@ -1,15 +1,45 @@
 import type { Metadata, Viewport } from "next";
-import { Creepster, Inter } from "next/font/google";
+import {
+  Inter,
+  Rubik_Glitch,
+  Rubik_Wet_Paint,
+  Ruslan_Display,
+} from "next/font/google";
 import "./globals.css";
 import { BUSINESS } from "@/data/quests";
 
 /**
- * Акцентный display-шрифт — готический/тревожный.
- * subset: latin (кириллицы в Creepster нет), display:swap для быстрой отрисовки.
+ * Шрифтовая система: три гарнитуры плюс основной текст.
+ *
+ * Все три декоративные гарнитуры взяты с подмножеством `cyrillic`.
+ * Это не мелочь: прежний Creepster кириллицу не содержит, поэтому все
+ * русские заголовки (а их два десятка) молча падали в системный запасной
+ * шрифт — «хоррор» оставался только на латинском логотипе.
+ *
+ * — Rubik Wet Paint: заголовки. Стекающие капли, жирный штрих,
+ *   читается даже мелко.
+ * — Ruslan Display: акцент. Старославянская вязь, «оккультный» характер
+ *   для названий комнат и логотипа.
+ * — Rubik Glitch: подписи в «повреждённых» местах — там, где и так
+ *   работает CSS-глитч. Только короткие строки.
  */
-const horror = Creepster({
-  variable: "--font-horror",
-  subsets: ["latin"],
+const displayFace = Rubik_Wet_Paint({
+  variable: "--font-display-face",
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  weight: "400",
+});
+
+const accentFace = Ruslan_Display({
+  variable: "--font-accent-face",
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  weight: "400",
+});
+
+const glitchFace = Rubik_Glitch({
+  variable: "--font-glitch-face",
+  subsets: ["latin", "cyrillic"],
   display: "swap",
   weight: "400",
 });
@@ -82,7 +112,7 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
-      className={`${horror.variable} ${body.variable} h-full antialiased`}
+      className={`${displayFace.variable} ${accentFace.variable} ${glitchFace.variable} ${body.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-void text-ash-text">
         {/*

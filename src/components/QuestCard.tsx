@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import SpotlightCard from "@/components/reactbits/SpotlightCard";
-import { QUEST_MEDIA } from "@/data/media";
+import { ROOM_SCENES } from "@/data/scenes";
 import type { Quest } from "@/data/quests";
 
-// Комнаты без медиа не бывает: подборка собрана для всех шести.
+// Комнаты без обложки не бывает: подборка собрана для всех шести.
 // Если ключ потеряется, лучше упасть на сборке, чем показать пустой прямоугольник.
-const FALLBACK = QUEST_MEDIA["sanatorium"];
+const FALLBACK = ROOM_SCENES["sanatorium"];
 
 /**
  * Карточка квеста.
@@ -25,7 +25,7 @@ export default function QuestCard({
   index: number;
   onOpen: (quest: Quest) => void;
 }) {
-  const cover = (QUEST_MEDIA[quest.id] ?? FALLBACK).cover;
+  const cover = ROOM_SCENES[quest.id] ?? FALLBACK;
 
   return (
     // id нужен, чтобы ссылка «Подробнее» вела на реальный якорь: без него

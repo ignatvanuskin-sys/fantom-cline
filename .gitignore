@@ -50,3 +50,7 @@ next-env.d.ts
 
 # local build artifacts and headless screenshots
 /.build/
+
+# »сходники сгенерированных изображений Ч в репозиторий идут только
+# обработанные JPEG из public/media.
+media-output/

@@ -1,14 +1,12 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Quests from "@/components/Quests";
-import Gallery from "@/components/Gallery";
-import VideoWall from "@/components/VideoWall";
 import HowItWorks from "@/components/HowItWorks";
 import Reviews from "@/components/Reviews";
-import InstagramStrip from "@/components/InstagramStrip";
 import Booking from "@/components/Booking";
 import Contacts from "@/components/Contacts";
 import Footer from "@/components/Footer";
+import StickyBookingBar from "@/components/StickyBookingBar";
 
 /**
  * Одностраничник с якорными секциями — оптимально для конверсии:
@@ -37,19 +35,21 @@ export default function Home() {
         <Hero />
         <Quests />
         {/*
-          Порядок секций — это путь гостя: сначала «что за комнаты» (карточки),
-          сразу за ними «как это выглядит» (галерея и видео) — на телефоне
-          решение принимают глазами, а не текстом. Правила и отзывы идут
-          после, когда интерес уже есть, и только затем форма записи.
+          Порядок секций — это путь гостя: сначала «какие есть комнаты»,
+          затем «как это устроено» и «что говорят другие» — то есть снятие
+          возражений, и только после него форма записи. Раньше между
+          комнатами и формой стояли галерея, видеостена и лента Instagram:
+          три экрана с прокруткой без нового смысла, из-за которых до формы
+          на телефоне было около тринадцати тысяч пикселей пути.
         */}
-        <Gallery />
-        <VideoWall />
         <HowItWorks />
         <Reviews />
-        <InstagramStrip />
         <Booking />
         <Contacts />
       </main>
+      {/* Липкая кнопка записи: только мобильные, живёт вне <main>,
+          потому что это не часть потока содержимого */}
+      <StickyBookingBar />
       <Footer />
     </>
   );

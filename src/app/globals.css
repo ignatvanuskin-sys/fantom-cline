@@ -33,8 +33,12 @@
   --color-dim-text: #a3a3a3;
   --color-faint-text: #808080;
 
-  /* --- Шрифты --- */
-  --font-display: var(--font-horror), "Impact", sans-serif;
+  /* --- Шрифты ---
+     Все декоративные гарнитуры с кириллицей: без неё русские заголовки
+     отрисовываются системным шрифтом, и характер теряется. */
+  --font-display: var(--font-display-face), "Impact", sans-serif;
+  --font-accent: var(--font-accent-face), "Georgia", serif;
+  --font-glitch: var(--font-glitch-face), "Courier New", monospace;
   --font-sans: var(--font-body), "Inter", system-ui, sans-serif;
 
   /* --- Анимации --- */
@@ -204,6 +208,24 @@ body {
   overscroll-behavior-x: none;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
+}
+
+/* Тач-таргеты: manipulation убирает задержку двойного тапа (браузер
+   не ждёт второго касания для зума) и «резиновое» выделение.
+   К текстовым полям не применяется — там нужен двойной тап по слову. */
+a,
+button,
+[role="button"],
+label,
+select {
+  touch-action: manipulation;
+}
+
+/* Цифры одной ширины. Нужно там, где числа меняются: счётчики
+   статистики и итог в форме — без этого блок дёргается по ширине
+   на каждом изменении разряда. */
+.tnum {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Длинные слова (названия квестов, адреса) не должны вылезать за карточку */
