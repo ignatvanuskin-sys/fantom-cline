@@ -103,6 +103,8 @@ export default function Gallery() {
                   ASPECT[photo.orientation] ?? "aspect-[3/4]"
                 }`}
               >
+                {/* Блик под кадром: работает без JS, картинка его перекрывает */}
+                <span aria-hidden="true" className="shimmer-layer" />
                 <Image
                   src={photo.src}
                   alt={photo.alt}

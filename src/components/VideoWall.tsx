@@ -143,6 +143,7 @@ function VideoTile({
           aria-label={`Воспроизвести видео: ${clip.title}`}
           className="group absolute inset-0 block h-full w-full"
         >
+          <span aria-hidden="true" className="shimmer-layer" />
           <Image
             src={clip.poster}
             alt={`Кадр из видео «${clip.title}»`}

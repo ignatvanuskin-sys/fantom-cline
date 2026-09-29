@@ -67,6 +67,7 @@ export default function InstagramStrip() {
             >
               <figure className="flex h-full flex-col border border-iron bg-smoke">
                 <span className="relative block aspect-[4/5] w-full overflow-hidden">
+                  <span aria-hidden="true" className="shimmer-layer" />
                   <Image
                     src={post.src}
                     alt={post.alt}

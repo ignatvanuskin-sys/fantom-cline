@@ -119,7 +119,7 @@ export default function Contacts() {
                   Рейтинг
                 </dt>
                 <dd className="mt-1.5 flex items-center gap-2">
-                  <span aria-hidden="true" className="text-blood-500">
+                  <span aria-hidden="true" className="text-blood-300">
                     ★
                   </span>
                   <span className="text-lg text-ash-text">{BUSINESS.rating}</span>

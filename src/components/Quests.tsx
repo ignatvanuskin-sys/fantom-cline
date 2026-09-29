@@ -102,7 +102,7 @@ export default function Quests() {
                   aria-hidden="true"
                   className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(184,18,26,0.10)_0%,transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 />
-                <dd className="relative font-display text-3xl text-blood-500 sm:text-4xl">
+                <dd className="relative font-display text-3xl text-blood-300 sm:text-4xl">
                   <CountUp to={stat.value} duration={1.6} separator=" " />
                 </dd>
                 <dt className="relative mt-1 text-[10px] uppercase tracking-[0.2em] text-faint-text sm:text-[11px]">

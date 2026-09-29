@@ -38,7 +38,7 @@ export default function Reviews() {
                         key={s}
                         aria-hidden="true"
                         className={`text-xs ${
-                          s < r.rating ? "text-blood-500" : "text-iron"
+                          s < r.rating ? "text-blood-300" : "text-iron"
                         }`}
                       >
                         ★

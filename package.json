@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "audit:mobile": "node scripts/audit-mobile.mjs",
-    "audit:wizard": "node scripts/audit-wizard.mjs"
+    "audit:wizard": "node scripts/audit-wizard.mjs",
+    "audit:full": "node scripts/audit-full.mjs",
+    "audit:metrics": "node scripts/audit-metrics.mjs"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.22",

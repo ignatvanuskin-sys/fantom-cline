@@ -87,6 +87,7 @@ export default function QuestModal({
             горизонтальный свайп внутри модалки конфликтует с её прокруткой. */}
         <div className="relative">
           <div className="relative aspect-[4/3] w-full overflow-hidden bg-smoke">
+            <span aria-hidden="true" className="shimmer-layer" />
             <Image
               key={main.src}
               src={main.src}

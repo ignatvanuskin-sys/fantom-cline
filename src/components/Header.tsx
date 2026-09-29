@@ -2,11 +2,20 @@
 
 import { useEffect, useState } from "react";
 import SoundToggle from "@/components/horror/SoundToggle";
+import ScrollProgress from "@/components/ScrollProgress";
 import { BUSINESS } from "@/data/quests";
 
-// Инлайновые иконки вместо lucide-react: в проекте нет внешних иконок,
-// а набор тут всего два значка — бургер и крест.
-function MenuIcon() {
+/**
+ * Бургер, который сам складывается в крест: крайние линии сходятся
+ * к центру и наклоняются на 45°, средняя гаснет.
+ *
+ * Движение здесь осмысленное, а не декоративное: иконка показывает,
+ * что состояние переключилось, и не требует подмены картинки.
+ * Наклон считается от центра каждой линии, поэтому вращение задано
+ * inline-стилем — в Tailwind сочетание translate + rotate для SVG
+ * зависит от того, какие свойства он сгенерирует.
+ */
+function MenuIcon({ open }: { open: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -17,9 +26,40 @@ function MenuIcon() {
       className="h-5 w-5"
       aria-hidden="true"
     >
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="4" y1="12" x2="20" y2="12" />
-      <line x1="4" y1="18" x2="20" y2="18" />
+      {/* transform-box: view-box — иначе transform-origin считается
+          от рамки линии, а у горизонтальной линии она нулевой высоты */}
+      <line
+        x1="4"
+        y1="6"
+        x2="20"
+        y2="6"
+        className="transition-transform duration-300 ease-out"
+        style={{
+          transformBox: "view-box",
+          transformOrigin: "12px 6px",
+          transform: open ? "translateY(6px) rotate(45deg)" : "none",
+        }}
+      />
+      <line
+        x1="4"
+        y1="12"
+        x2="20"
+        y2="12"
+        className="transition-opacity duration-200"
+        style={{ opacity: open ? 0 : 1 }}
+      />
+      <line
+        x1="4"
+        y1="18"
+        x2="20"
+        y2="18"
+        className="transition-transform duration-300 ease-out"
+        style={{
+          transformBox: "view-box",
+          transformOrigin: "12px 18px",
+          transform: open ? "translateY(-6px) rotate(-45deg)" : "none",
+        }}
+      />
     </svg>
   );
 }
@@ -104,7 +144,9 @@ export default function Header() {
           <a
             href="#hero"
             aria-label="Fantom — на главную"
-            className="flex min-h-11 items-center font-display text-2xl leading-none text-blood-500 transition-colors hover:text-blood-300"
+            // blood-300 (#dd4448) вместо blood-500: на 24px тёмно-красный
+            // давал контраст 2.96:1 при норме 3:1 для крупного текста.
+            className="flex min-h-11 items-center font-display text-2xl leading-none text-blood-300 transition-colors hover:text-ash-text"
           >
             {BUSINESS.name}
           </a>
@@ -133,7 +175,7 @@ export default function Header() {
           <a
             href="#booking"
             aria-label="Записаться на квест"
-            className="tap-target hidden items-center bg-blood-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors hover:bg-blood-500 lg:inline-flex"
+            className="tap-target hidden items-center bg-blood-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ash-text transition-[background-color,color,transform,box-shadow] duration-200 hover:bg-blood-500 active:scale-[0.97] lg:inline-flex"
           >
             Записаться
           </a>
@@ -141,7 +183,7 @@ export default function Header() {
           <a
             href="#booking"
             aria-label="Записаться на квест"
-            className="tap-target flex items-center bg-blood-700 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors hover:bg-blood-500 lg:hidden"
+            className="tap-target flex items-center bg-blood-700 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,color,transform,box-shadow] duration-200 hover:bg-blood-500 active:scale-[0.97] lg:hidden"
           >
             Запись
           </a>
@@ -157,10 +199,13 @@ export default function Header() {
             aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
             className="tap-target flex h-11 w-11 shrink-0 items-center justify-center border border-ash-text/20 text-ash-text transition-colors hover:border-ash-text/40 lg:hidden"
           >
-            <MenuIcon />
+            <MenuIcon open={menuOpen} />
           </button>
         </div>
       </div>
+
+      {/* Полоса прогресса чтения — по нижней кромке шапки */}
+      <ScrollProgress />
     </header>
 
     {/* Полноэкранная панель. Вынесена из <header> намеренно: у шапки
@@ -213,7 +258,7 @@ export default function Header() {
               <a
                 href="#booking"
                 onClick={() => setMenuOpen(false)}
-                className="flex min-h-[56px] items-center justify-center bg-blood-700 px-6 text-sm font-semibold uppercase tracking-[0.16em] text-ash-text transition-colors active:bg-blood-500"
+                className="flex min-h-[56px] items-center justify-center bg-blood-700 px-6 text-sm font-semibold uppercase tracking-[0.16em] text-ash-text transition-[background-color,transform] duration-200 active:scale-[0.98] active:bg-blood-500"
               >
                 Забронировать место
               </a>

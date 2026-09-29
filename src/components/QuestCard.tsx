@@ -28,7 +28,10 @@ export default function QuestCard({
   const cover = (QUEST_MEDIA[quest.id] ?? FALLBACK).cover;
 
   return (
-    <article className="group relative h-full">
+    // id нужен, чтобы ссылка «Подробнее» вела на реальный якорь: без него
+    // href="#quest-…" был ссылкой в никуда (и ломался без JS).
+    // scroll-mt компенсирует липкую шапку при переходе по якорю.
+    <article id={`quest-${quest.id}`} className="group relative h-full scroll-mt-24">
       {/* React Bits: SpotlightCard — за курсором идёт кровавое пятно,
           будто карточку подсвечивают фонариком в тёмном коридоре */}
       <SpotlightCard
@@ -40,8 +43,21 @@ export default function QuestCard({
         className="relative flex h-full flex-col overflow-hidden border border-iron bg-smoke transition-all duration-500 hover:border-blood-700/60 hover:shadow-[0_0_50px_-12px_rgba(138,3,3,0.55)]"
         style={{ animationDelay: `${index * 60}ms` }}
       >
+        {/* Подсветка по контуру у «хита»: карточка дышит, а не просто
+            помечена плашкой. Рамка лежит внутри карточки и не влияет
+            на раскладку — её не видно при prefers-reduced-motion
+            (глобальное правило гасит длительность анимаций). */}
+        {quest.featured && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-10 animate-glow border border-blood-500"
+          />
+        )}
+
         {/* Обложка — реальный кадр комнаты из 2ГИС. */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-ash">
+          {/* Блик под ещё не загруженным кадром */}
+          <span aria-hidden="true" className="shimmer-layer" />
           <Image
             src={cover.src}
             alt={cover.alt}
@@ -142,9 +158,27 @@ export default function QuestCard({
                 e.preventDefault();
                 onOpen(quest);
               }}
-              className="tap-target relative inline-flex items-center justify-center overflow-hidden border border-blood-700/60 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors hover:bg-blood-700"
+              className="tap-target relative inline-flex items-center justify-center gap-1.5 overflow-hidden border border-blood-700/60 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,border-color,transform] duration-200 hover:bg-blood-700 active:scale-[0.97]"
             >
               Подробнее
+              {/* Стрелка «уезжает» при наведении на карточку — движение
+                  показывает, куда ведёт нажатие, а не просто украшает */}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                aria-hidden="true"
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                <path
+                  d="M2 6h8M6.5 2.5 10 6l-3.5 3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </a>
           </div>
         </div>

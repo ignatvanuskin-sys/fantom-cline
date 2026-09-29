@@ -102,7 +102,7 @@ export function GothicDivider({ className = "" }: { className?: string }) {
 export function DropCap({ letter, className = "" }: { letter: string; className?: string }) {
   return (
     <span className={`relative inline-block ${className}`}>
-      <span className="font-display text-[3.4em] leading-[0.72] text-blood-500 drop-shadow-[0_0_18px_rgba(184,18,26,0.45)]">
+      <span className="font-display text-[3.4em] leading-[0.72] text-blood-300 drop-shadow-[0_0_18px_rgba(221,68,72,0.45)]">
         {letter}
       </span>
     </span>

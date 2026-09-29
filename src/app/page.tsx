@@ -21,8 +21,19 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <>
+      {/*
+        Ссылка «к содержимому»: страница длинная, а навигация в шапке
+        состоит из шести пунктов. Без пропуска человек с клавиатуры
+        проходит их заново на каждом переходе. Видна только при фокусе.
+      */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:border focus:border-blood-500 focus:bg-void focus:px-4 focus:py-3 focus:text-sm focus:text-ash-text"
+      >
+        Перейти к содержимому
+      </a>
       <Header />
-      <main className="flex-1">
+      <main id="main" className="flex-1">
         <Hero />
         <Quests />
         {/*

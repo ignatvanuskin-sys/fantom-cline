@@ -18,6 +18,7 @@ import { BUSINESS } from "@/data/quests";
 export default function DarkMap() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("leaflet").Map | null>(null);
+  const observerRef = useRef<ResizeObserver | null>(null);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -80,19 +81,19 @@ export default function DarkMap() {
       });
 
       // Leaflet требует invalidateSize, когда контейнер становится видимым
-      // (ленивая загрузка секции, смена брейкпоинта)
+      // (ленивая загрузка секции, смена брейкпоинта).
+      // Наблюдатель держим в ref: раньше он создавался здесь же, но
+      // возвращаемая из async-функции очистка никуда не попадала —
+      // при размонтировании он продолжал следить за удалённым узлом.
       const observer = new ResizeObserver(() => map.invalidateSize());
       observer.observe(el);
-      mapRef.current = map;
-
-      return () => {
-        observer.disconnect();
-        map.remove();
-      };
+      observerRef.current = observer;
     })();
 
     return () => {
       cancelled = true;
+      observerRef.current?.disconnect();
+      observerRef.current = null;
       mapRef.current?.remove();
       mapRef.current = null;
     };
@@ -194,12 +195,14 @@ export default function DarkMap() {
           background: #8a0303;
           color: #e8e8e8;
         }
+        /* Подписи Leaflet рассчитаны на светлую карту: #5e5e5e на тёмной
+           подложке давал 2.5:1. Значения совпадают с токенами темы. */
         .leaflet-control-attribution {
-          background: rgba(10, 10, 10, 0.82) !important;
-          color: #5e5e5e !important;
+          background: rgba(10, 10, 10, 0.86) !important;
+          color: #a3a3a3 !important;
           font-size: 10px;
         }
-        .leaflet-control-attribution a { color: #8a8a8a !important; }
+        .leaflet-control-attribution a { color: #c9c9c9 !important; }
       `}</style>
     </div>
   );

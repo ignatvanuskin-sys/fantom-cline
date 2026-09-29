@@ -15,18 +15,23 @@
 
   /* --- Акценты --- */
   --color-blood-900: #5c0202;
-  --color-blood-700: #8a0303; /* основной акцент */
-  --color-blood-500: #b8121a; /* hover / подсветка */
-  --color-blood-300: #d33a3f; /* мягкий акцент */
+  --color-blood-700: #8a0303; /* основной акцент, заливки кнопок */
+  --color-blood-500: #b8121a; /* hover заливок, декор */
+  --color-blood-300: #e04a4e; /* акцент для ТЕКСТА: 4.6:1 на карточке */
 
   --color-rust-700: #3a2a18;
   --color-rust-500: #6b4a24; /* ржавый металлик */
   --color-moss-600: #2f3a26; /* болотный зелёный */
 
-  /* --- Текст (не чисто белый) --- */
+  /* --- Текст (не чисто белый) ---
+     Три ступени серого подобраны под контраст WCAG AA, а не «на глаз».
+     Фон карточек — smoke #141414, самый светлый из тёмных; для него
+     faint-text даёт 4.67:1, dim-text 7.3:1, ash-text 11.4:1.
+     Прежние #5e5e5e и #8a8a8a давали 2.84:1 — мелкие подписи на карточках
+     («Сложность», «Время», «16+», «₸ / чел.») формально были нечитаемы. */
   --color-ash-text: #c9c9c9;
-  --color-dim-text: #8a8a8a;
-  --color-faint-text: #5e5e5e;
+  --color-dim-text: #a3a3a3;
+  --color-faint-text: #808080;
 
   /* --- Шрифты --- */
   --font-display: var(--font-horror), "Impact", sans-serif;
@@ -38,6 +43,7 @@
   --animate-drift: drift 18s ease-in-out infinite alternate;
   --animate-pulse-bar: pulse-bar 1.6s ease-in-out infinite;
   --animate-breathe: breathe 4s ease-in-out infinite;
+  --animate-glow: glow 3.2s ease-in-out infinite;
 }
 
 @keyframes flicker {
@@ -110,6 +116,51 @@
   50% {
     opacity: 0.85;
   }
+}
+
+/* Подсветка «избранной» карточки по контуру. */
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Заглушка под ещё не загруженным кадром. Работает без JavaScript:
+   блик лежит ПОД картинкой, а картинка перекрывает его собой, когда
+   догрузится. Пропорцию задаёт контейнер, поэтому вёрстка не прыгает.
+   Сдвигается именно transform, а не background-position: плиток на
+   странице около пятидесяти, и перерисовка каждой на каждом кадре
+   убила бы плавность прокрутки. Сдвиг элемента делает композитор. */
+.shimmer-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.shimmer-layer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(255 255 255 / 0.05) 50%,
+    transparent 80%
+  );
+  animation: shimmer 1.5s linear infinite;
 }
 
 /* ============================================================

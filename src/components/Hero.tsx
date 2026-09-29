@@ -191,7 +191,9 @@ export default function Hero() {
             clamp вместо vw: на 320px «FANTOM» рисковал выйти за край,
             на 430+ был мелковат. */}
         <h1
-          className="font-display text-[clamp(2.9rem,21vw,9rem)] leading-[0.85] text-blood-500 sm:text-[16vw] md:text-[9rem]"
+          // blood-300, а не blood-500: главный заголовок лежит на затемнённом
+          // фото, и тёмно-красный не дотягивал до 3:1 для крупного текста.
+          className="font-display text-[clamp(2.9rem,21vw,9rem)] leading-[0.85] text-blood-300 sm:text-[16vw] md:text-[9rem]"
           aria-label={BUSINESS.name}
         >
           {letters.map((letter, i) => (
@@ -259,7 +261,7 @@ export default function Hero() {
             <a
               href="#quests"
               onClick={() => sfx("door")}
-              className="group tap-target relative flex items-center justify-center overflow-hidden bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors duration-300 hover:bg-blood-500"
+              className="group tap-target relative flex items-center justify-center overflow-hidden bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-[background-color,transform] duration-200 hover:bg-blood-500 active:scale-[0.97]"
             >
               <span className="relative z-10">Войти, если осмелишься</span>
               {/* «проявление из тумана» при hover */}

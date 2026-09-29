@@ -259,16 +259,22 @@ function WhoPicker({
   stack: boolean;
 }) {
   const min = quest?.minPlayers ?? 2;
+  // Почему ошибка написана прямо под полем, а не только в общей плашке:
+  // плашка живёт внизу формы, и на телефоне человек, ошибшийся в телефоне,
+  // её просто не видит. Плюс поле подсвечивается и получает описание
+  // через aria-describedby — иначе screen reader не скажет, что не так.
+  const nameError = name.length > 0 && !nameValid;
+  const phoneError = phone.replace(/\D/g, "").length > 3 && !phoneValid;
   const max = quest?.maxPlayers ?? 8;
 
   return (
-    // Подписи полей — тоже цели нажатия: py-1 поднимает их высоту до 25px,
+    // Подписи полей — тоже цели нажатия: py-2 поднимает их высоту до 33px,
     // иначе кликабельная подпись мельче минимального размера цели (WCAG 2.5.8).
     <div className={stack ? "space-y-6" : "grid gap-5 sm:grid-cols-2"}>
       <div>
         <label
           htmlFor="players"
-          className="mb-1 block py-1 text-[11px] uppercase tracking-[0.25em] text-faint-text"
+          className="block py-2 text-[11px] uppercase tracking-[0.25em] text-faint-text"
         >
           Игроков
         </label>
@@ -314,7 +320,7 @@ function WhoPicker({
         <div>
           <label
             htmlFor="name"
-            className="mb-1 block py-1 text-[11px] uppercase tracking-[0.25em] text-faint-text"
+            className="block py-2 text-[11px] uppercase tracking-[0.25em] text-faint-text"
           >
             Ваше имя
           </label>
@@ -326,14 +332,22 @@ function WhoPicker({
             placeholder="Как к вам обращаться"
             autoComplete="name"
             required
-            aria-invalid={name.length > 0 && !nameValid}
-            className="tap-target w-full border border-iron bg-ash px-4 py-4 text-base text-ash-text outline-none transition-colors placeholder:text-faint-text focus:border-blood-700"
+            aria-invalid={nameError}
+            aria-describedby={nameError ? "name-error" : undefined}
+            className={`tap-target w-full border bg-ash px-4 py-4 text-base text-ash-text outline-none transition-colors placeholder:text-faint-text focus:border-blood-500 focus:shadow-[0_0_0_3px_rgba(184,18,26,0.22)] ${
+              nameError ? "border-blood-500" : "border-iron"
+            }`}
           />
+          {nameError && (
+            <p id="name-error" className="mt-1.5 text-[11px] leading-relaxed text-blood-300">
+              Достаточно двух букв — как к вам обращаться.
+            </p>
+          )}
         </div>
         <div>
           <label
             htmlFor="phone"
-            className="mb-1 block py-1 text-[11px] uppercase tracking-[0.25em] text-faint-text"
+            className="block py-2 text-[11px] uppercase tracking-[0.25em] text-faint-text"
           >
             Телефон
           </label>
@@ -346,9 +360,17 @@ function WhoPicker({
             placeholder="+7 (___) ___-__-__"
             autoComplete="tel"
             required
-            aria-invalid={phone.length > 3 && !phoneValid}
-            className="tap-target w-full border border-iron bg-ash px-4 py-4 text-base text-ash-text outline-none transition-colors placeholder:text-faint-text focus:border-blood-700"
+            aria-invalid={phoneError}
+            aria-describedby={phoneError ? "phone-error" : undefined}
+            className={`tap-target w-full border bg-ash px-4 py-4 text-base text-ash-text outline-none transition-colors placeholder:text-faint-text focus:border-blood-500 focus:shadow-[0_0_0_3px_rgba(184,18,26,0.22)] ${
+              phoneError ? "border-blood-500" : "border-iron"
+            }`}
           />
+          {phoneError && (
+            <p id="phone-error" className="mt-1.5 text-[11px] leading-relaxed text-blood-300">
+              Нужны 11 цифр, например +7 (700) 000-00-00.
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -497,7 +519,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
           {players === 1 ? "игрок" : "игрока(ов)"}
         </p>
         <p
-          className="mt-6 font-display text-lg text-blood-500"
+          className="mt-6 font-display text-lg text-blood-300"
           style={{ animation: "fade-up 0.5s 0.4s both" }}
         >
           {/* React Bits: GlitchText — предупреждение сбоит, потом стабилизируется */}
@@ -683,7 +705,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
           <button
             type="button"
             onClick={() => setStepIndex((s) => s + 1)}
-            className="tap-target flex flex-1 items-center justify-center bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors active:bg-blood-500"
+            className="tap-target flex flex-1 items-center justify-center bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,transform] duration-200 active:scale-[0.98] active:bg-blood-500"
           >
             Далее
           </button>
@@ -698,7 +720,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
             <button
               type="submit"
               disabled={!canSubmit}
-              className="tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors duration-300 active:bg-blood-500 disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text"
+              className="tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,transform,box-shadow] duration-200 hover:bg-blood-500 focus-visible:shadow-[0_0_0_3px_rgba(184,18,26,0.28)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text disabled:active:scale-100"
             >
               <span className="relative z-10">
                 {status === "sending" ? "Отправляем…" : "Забронировать место"}

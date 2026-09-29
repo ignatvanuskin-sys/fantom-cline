@@ -76,7 +76,7 @@ export default function HowItWorks() {
                 <span
                   aria-hidden="true"
                   className={`mt-0.5 shrink-0 ${
-                    r.ok ? "text-[#7fa06a]" : "text-blood-500"
+                    r.ok ? "text-[#7fa06a]" : "text-blood-300"
                   }`}
                 >
                   {r.ok ? (
