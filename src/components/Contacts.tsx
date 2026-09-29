@@ -1,4 +1,5 @@
 import { BUSINESS } from "@/data/quests";
+import StarIcon from "@/components/horror/StarIcon";
 import DarkMap from "./DarkMap";
 import Reveal from "./Reveal";
 
@@ -119,9 +120,7 @@ export default function Contacts() {
                   Рейтинг
                 </dt>
                 <dd className="mt-1.5 flex items-center gap-2">
-                  <span aria-hidden="true" className="text-blood-300">
-                    ★
-                  </span>
+                  <StarIcon className="h-4 w-4 shrink-0 text-blood-300" />
                   <span className="text-lg text-ash-text">{BUSINESS.rating}</span>
                   <span className="text-sm text-faint-text">
                     {BUSINESS.ratingCount} оценок · {BUSINESS.reviewCount}{" "}

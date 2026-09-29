@@ -197,6 +197,7 @@ export default function Header() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
+            data-testid="menu-toggle"
             className="tap-target flex h-11 w-11 shrink-0 items-center justify-center border border-ash-text/20 text-ash-text transition-colors hover:border-ash-text/40 lg:hidden"
           >
             <MenuIcon open={menuOpen} />
@@ -263,16 +264,32 @@ export default function Header() {
                 Забронировать место
               </a>
 
-              {/* Телефон у клиента пока не подтверждён (BUSINESS.phone — пустая
-                  строка, поэтому проверяем на "" а не на null), ведём на запись. */}
+              {/* Номер подтверждён по 2ГИС, но страховка на пустое значение
+                  остаётся: если телефон уберут из данных, ссылка не должна
+                  превратиться в tel: без номера. */}
               <a
                 href={BUSINESS.phone ? `tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}` : "#booking"}
                 onClick={() => setMenuOpen(false)}
                 className="flex min-h-12 items-center justify-center gap-2 border border-ash-text/20 px-6 text-xs uppercase tracking-[0.16em] text-dim-text"
               >
-                <span className="text-blood-300" aria-hidden="true">
-                  {BUSINESS.phone ? "✆" : "→"}
-                </span>
+                {/* Трубка нарисована SVG, а не символом «✆»: у U+2706 плохое
+                    покрытие в шрифтах, и на части систем вместо трубки
+                    рисовался перечёркнутый круг — знак отсутствующего глифа. */}
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                  className="shrink-0 text-blood-300"
+                >
+                  <path
+                    d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 6 6L16.5 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 {BUSINESS.phone || "Записаться онлайн"}
               </a>
             </div>

@@ -28,14 +28,24 @@ export default function StickyBookingBar() {
 
     const measure = () => {
       frame = 0;
-      const booking = document.getElementById("booking");
-      const bookingTop = booking
-        ? booking.getBoundingClientRect().top
-        : Number.POSITIVE_INFINITY;
 
-      const pastHero = window.scrollY > window.innerHeight * 0.85;
-      const formInView = bookingTop < window.innerHeight * 0.9;
-      setShown(pastHero && !formInView);
+      // Пока открыто полноэкранное меню, панель не показываем: она всё
+      // равно перекрыта оверлеем, но оставалась бы в порядке обхода табом.
+      const menuOpen = Boolean(document.getElementById("mobile-menu"));
+
+      const booking = document.getElementById("booking");
+      let formInView = false;
+      if (booking) {
+        const r = booking.getBoundingClientRect();
+        // Форма считается «в кадре», только если она реально пересекает
+        // экран. Раньше проверялся один верх: уйдя ниже формы — к контактам
+        // и подвалу — гость терял кнопку записи до самого конца страницы и
+        // не мог вернуться к записи одним нажатием.
+        formInView = r.top < window.innerHeight * 0.9 && r.bottom > 0;
+      }
+
+      const pastHero = window.scrollY > window.innerHeight * 0.7;
+      setShown(pastHero && !formInView && !menuOpen);
     };
 
     const onScroll = () => {
@@ -60,6 +70,7 @@ export default function StickyBookingBar() {
 
   return (
     <div
+      data-testid="sticky-booking"
       inert={!shown}
       className={`fixed inset-x-0 bottom-0 z-[55] border-t border-iron bg-void/95 backdrop-blur-md transition-transform duration-300 ease-out lg:hidden ${
         shown ? "translate-y-0" : "translate-y-full"
@@ -77,6 +88,7 @@ export default function StickyBookingBar() {
         </p>
         <a
           href="#booking"
+          data-testid="sticky-booking-cta"
           className="tap-target flex shrink-0 items-center justify-center bg-blood-700 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-ash-text transition-[background-color,transform] duration-200 hover:bg-blood-500 active:scale-[0.97]"
         >
           Забронировать

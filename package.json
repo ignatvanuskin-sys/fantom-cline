@@ -11,6 +11,7 @@
     "audit:wizard": "node scripts/audit-wizard.mjs",
     "audit:full": "node scripts/audit-full.mjs",
     "audit:metrics": "node scripts/audit-metrics.mjs",
+    "audit:booking": "node scripts/audit-booking.mjs",
     "shots": "node scripts/shots.mjs"
   },
   "dependencies": {

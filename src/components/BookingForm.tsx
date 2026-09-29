@@ -456,17 +456,28 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
     */
     const problem = !nameValid ? "name" : !phoneValid ? "phone" : !time ? "time" : null;
     if (problem) {
-      setError(
+      const message =
         problem === "name"
           ? "Укажите имя — администратор перезвонит и подтвердит бронь."
           : problem === "phone"
             ? "Проверьте номер: нужно 11 цифр, начиная с 7."
-            : "Выберите время — свободные слоты обновляются каждый день.",
-      );
+            : "Выберите время — от часа зависит, сколько мест осталось.";
+
       const field =
         problem === "time"
           ? document.querySelector<HTMLInputElement>('input[name="time"]')
           : document.getElementById(problem);
+
+      // На телефоне форма разбита на шаги, и поля времени в разметке может
+      // не быть — тогда сообщение указывало бы на то, чего не видно.
+      // Возвращаемся на нужный шаг и только потом говорим, что не так.
+      if (!field && isMobile) {
+        goToStep(problem === "time" ? 1 : 2);
+        setError(message);
+        return;
+      }
+
+      setError(message);
       field?.focus();
       return;
     }
@@ -583,6 +594,62 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
   const step = Math.min(Math.max(stepIndex, 0), steps.length - 1);
   const isLast = step === steps.length - 1;
 
+  /**
+   * Переход между шагами мастера на телефоне.
+   *
+   * Зачем проверять на входе: раньше «Далее» со шага «Когда» уводила на
+   * «Кто» даже без выбранного времени — то есть записаться можно было,
+   * не выбрав час. Ошибка всплывала только на последнем шаге, на поле,
+   * которого перед глазами уже нет. Теперь шаг закрывается своим полем,
+   * а фокус уезжает туда, где не хватает данных.
+   *
+   * Плюс прокрутка: после смены шага экран оставался на прежнем месте,
+   * и заголовок нового шага оказывался выше видимой области.
+   */
+  function goToStep(next: number) {
+    if (next > step) {
+      // Проверяем только то, что закрывает ТЕКУЩИЙ шаг. Проверка «всего
+      // сразу» блокировала бы выход с шага «Квест»: время выбирают на
+      // следующем шаге, и требовать его раньше — тупик.
+      const missing =
+        step === 0
+          ? null
+          : !date
+            ? {
+                attr: "date",
+                message: "Выберите день — свободные даты обновляются каждый день.",
+              }
+            : !time
+              ? {
+                  attr: "time",
+                  message:
+                    "Выберите время — от часа зависит, сколько мест осталось.",
+                }
+              : null;
+
+      if (missing) {
+        setError(missing.message);
+        const field = document.querySelector<HTMLInputElement>(
+          `input[name="${missing.attr}"]`,
+        );
+        field?.focus();
+        field?.scrollIntoView({ block: "center" });
+        return;
+      }
+    }
+
+    setError("");
+    setStepIndex(next);
+
+    // Прокручиваем уже после отрисовки нового шага, иначе браузер
+    // посчитает позицию по старой, более длинной раскладке.
+    requestAnimationFrame(() => {
+      document
+        .getElementById("booking")
+        ?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+  }
+
   // Что уже выбрано — показываем в шапке мастера
   const chosenDate = dates.find((d) => d.iso === date);
   const summary = [
@@ -627,7 +694,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
               <button
                 key={s.key}
                 type="button"
-                onClick={() => setStepIndex(i)}
+                onClick={() => goToStep(i)}
                 // tap-target: без него полоска-индикатор даёт кнопке высоту
                 // 20px — по пальцу в неё не попасть
                 className="tap-target flex-1 py-2"
@@ -742,7 +809,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         {isMobile && step > 0 && (
           <button
             type="button"
-            onClick={() => setStepIndex((s) => s - 1)}
+            onClick={() => goToStep(step - 1)}
             className="tap-target flex w-28 shrink-0 items-center justify-center border border-iron text-sm font-semibold uppercase tracking-[0.12em] text-dim-text transition-colors active:border-blood-700 active:text-ash-text"
           >
             Назад
@@ -752,7 +819,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         {isMobile && !isLast ? (
           <button
             type="button"
-            onClick={() => setStepIndex((s) => s + 1)}
+            onClick={() => goToStep(step + 1)}
             className="tap-target flex flex-1 items-center justify-center bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,transform] duration-200 active:scale-[0.98] active:bg-blood-500"
           >
             Далее

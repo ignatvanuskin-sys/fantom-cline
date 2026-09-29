@@ -1,3 +1,4 @@
+import StarIcon from "@/components/horror/StarIcon";
 import { REVIEWS } from "@/data/quests";
 import Reveal from "./Reveal";
 
@@ -37,11 +38,11 @@ export default function Reviews() {
                       <span
                         key={s}
                         aria-hidden="true"
-                        className={`text-xs ${
+                        className={`inline-flex ${
                           s < r.rating ? "text-blood-300" : "text-iron"
                         }`}
                       >
-                        ★
+                        <StarIcon className="h-3.5 w-3.5" />
                       </span>
                     ))}
                   </div>
