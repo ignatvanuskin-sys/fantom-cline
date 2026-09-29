@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import GlitchText from "@/components/reactbits/GlitchText";
 import { sfx } from "@/components/horror/SoundToggle";
+import { QUEST_MEDIA } from "@/data/media";
 import type { Quest } from "@/data/quests";
 
 /**
@@ -21,6 +23,14 @@ export default function QuestModal({
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  /**
+   * Открытый кадр галереи. Храним вместе с id комнаты: при открытии другой
+   * комнаты индекс сбрасывается сам, без setState внутри эффекта — вызов
+   * setState синхронно в эффекте даёт лишний каскадный рендер.
+   */
+  const [picked, setPicked] = useState<{ id: string; index: number } | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!quest) return;
@@ -40,6 +50,10 @@ export default function QuestModal({
   }, [quest, onClose]);
 
   if (!quest) return null;
+
+  const media = QUEST_MEDIA[quest.id] ?? QUEST_MEDIA["sanatorium"];
+  const shot = picked?.id === quest.id ? picked.index : 0;
+  const main = media.gallery[shot] ?? media.cover;
 
   return (
     <div
@@ -68,23 +82,60 @@ export default function QuestModal({
           }
         `}</style>
 
-        {/* Галерея. TODO: заменить на реальные фото комнат. */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden bg-smoke">
-          <div
-            className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,#241815_0%,#0e0c0b_65%)]"
-            aria-hidden="true"
-          />
-          <div
-            className="absolute inset-0 opacity-25"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(115deg, transparent 0 7px, rgba(0,0,0,0.4) 7px 8px)",
-            }}
-            aria-hidden="true"
-          />
-          <span className="absolute bottom-3 left-4 text-[10px] uppercase tracking-[0.25em] text-faint-text">
-            Фотогалерея · {quest.gallery.length} кадра
-          </span>
+        {/* Галерея комнаты: реальные кадры из 2ГИС.
+            На телефоне миниатюры — самый быстрый способ переключить кадр:
+            горизонтальный свайп внутри модалки конфликтует с её прокруткой. */}
+        <div className="relative">
+          <div className="relative aspect-[4/3] w-full overflow-hidden bg-smoke">
+            <Image
+              key={main.src}
+              src={main.src}
+              alt={main.alt}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 42rem"
+              className="object-cover"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-t from-ash via-transparent to-transparent"
+            />
+            <span className="absolute bottom-3 left-4 text-[10px] uppercase tracking-[0.25em] text-faint-text">
+              Фотогалерея · {media.gallery.length} кадра · 2ГИС
+            </span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-px border-t border-iron bg-iron">
+            {media.gallery.map((frame, i) => (
+              <button
+                key={frame.src}
+                type="button"
+                onClick={() => setPicked({ id: quest.id, index: i })}
+                aria-label={`Показать кадр ${i + 1}: ${frame.alt}`}
+                aria-current={i === shot}
+                className="relative aspect-square overflow-hidden bg-smoke"
+              >
+                <Image
+                  src={frame.src}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 24vw, 11rem"
+                  className="object-cover"
+                />
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-0 border-2 transition-opacity duration-300 ${
+                    i === shot
+                      ? "border-blood-500 opacity-100"
+                      : "border-transparent opacity-0"
+                  }`}
+                />
+                {i !== shot && (
+                  <span aria-hidden="true" className="absolute inset-0 bg-void/55" />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
 
         <button

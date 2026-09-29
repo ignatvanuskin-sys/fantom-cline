@@ -43,6 +43,8 @@ function CloseIcon() {
 
 const NAV = [
   { href: "#quests", label: "Квесты" },
+  { href: "#gallery", label: "Галерея" },
+  { href: "#video", label: "Видео" },
   { href: "#how", label: "Как проходит" },
   { href: "#reviews", label: "Отзывы" },
   { href: "#contacts", label: "Контакты" },
@@ -73,7 +75,9 @@ export default function Header() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMenuOpen(false);
     };
-    const mq = window.matchMedia("(min-width: 768px)");
+    // 1024, а не 768: с шестью пунктами навигация перестала помещаться
+    // в шапку на планшете (768–1023px) — бургер там остаётся нужным.
+    const mq = window.matchMedia("(min-width: 1024px)");
     const onChange = () => {
       if (mq.matches) setMenuOpen(false);
     };
@@ -105,8 +109,9 @@ export default function Header() {
             {BUSINESS.name}
           </a>
 
-        {/* Навигация только на десктопе — на телефоне её открывает бургер */}
-        <nav aria-label="Основная навигация" className="hidden md:block">
+        {/* Навигация только на широких экранах: до 1024px её открывает бургер,
+            иначе шесть пунктов + логотип + кнопка не влезают в строку */}
+        <nav aria-label="Основная навигация" className="hidden lg:block">
           <ul className="flex items-center gap-7">
             {NAV.map((n) => (
               <li key={n.href}>
@@ -128,7 +133,7 @@ export default function Header() {
           <a
             href="#booking"
             aria-label="Записаться на квест"
-            className="tap-target hidden items-center bg-blood-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors hover:bg-blood-500 md:inline-flex"
+            className="tap-target hidden items-center bg-blood-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ash-text transition-colors hover:bg-blood-500 lg:inline-flex"
           >
             Записаться
           </a>
@@ -136,7 +141,7 @@ export default function Header() {
           <a
             href="#booking"
             aria-label="Записаться на квест"
-            className="tap-target flex items-center bg-blood-700 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors hover:bg-blood-500 md:hidden"
+            className="tap-target flex items-center bg-blood-700 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ash-text transition-colors hover:bg-blood-500 lg:hidden"
           >
             Запись
           </a>
@@ -150,7 +155,7 @@ export default function Header() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
-            className="tap-target flex h-11 w-11 shrink-0 items-center justify-center border border-ash-text/20 text-ash-text transition-colors hover:border-ash-text/40 md:hidden"
+            className="tap-target flex h-11 w-11 shrink-0 items-center justify-center border border-ash-text/20 text-ash-text transition-colors hover:border-ash-text/40 lg:hidden"
           >
             <MenuIcon />
           </button>
@@ -167,7 +172,7 @@ export default function Header() {
           role="dialog"
           aria-modal="true"
           aria-label="Меню"
-          className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-void/98 backdrop-blur-xl md:hidden"
+          className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-void/98 backdrop-blur-xl lg:hidden"
         >
           <div className="flex shrink-0 items-center justify-between border-b border-iron px-5 py-3">
             <span className="text-xs uppercase tracking-[0.24em] text-dim-text">

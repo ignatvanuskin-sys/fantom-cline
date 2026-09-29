@@ -1,0 +1,138 @@
+[
+  {
+    "file": "2gis-video-covers/video-01.jpg",
+    "duration": 29,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/99c28c420264cd561169c6b0258f0e84399485b6/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-02.jpg",
+    "duration": 57,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/hdr-2-sdr/5efe4a0bc842c232b67034a00f87606c1ade87c3/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-03.jpg",
+    "duration": 6,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/218d24d9d1b99ed371b3b93468308b3e2db2c61a/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-04.jpg",
+    "duration": 8,
+    "width": 1920,
+    "height": 1080,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/9ed5bd6ab0ac1dbe0c627d7450ebfb2bce412ef8/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-05.jpg",
+    "duration": 7,
+    "width": 1920,
+    "height": 1080,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/92c7f163fd46ebb4945dcd51dd621181d733a852/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-06.jpg",
+    "duration": 7,
+    "width": 1920,
+    "height": 1080,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/ed63dbf3aa1c1e2cc1819f1a6dd868a0a8b1c181/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-07.jpg",
+    "duration": 11,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/0ad1bc43cf2dd28babacab2344702f25473f3395/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-08.jpg",
+    "duration": 14,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/f8684337738714187e3600f0594a6ba215dfc45a/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-09.jpg",
+    "duration": 4,
+    "width": 1920,
+    "height": 1080,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/0b6f357cdb19f87cfd1135c8b80e09c91b8157cd/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-10.jpg",
+    "duration": 5,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/562f96bab355bead9e58c0ea59cd2b85cfd46fd6/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-11.jpg",
+    "duration": 12,
+    "width": 720,
+    "height": 1280,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/a37c73f1560445d1307435e48a171b22e3130a75/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-12.jpg",
+    "duration": 8,
+    "width": 1920,
+    "height": 1080,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/747b741f14e19961622c67f6419ce1fb2e39b231/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-13.jpg",
+    "duration": 32,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/d55d5b84c00083a38574efa6daa8a6b8b777e9f1/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-14.jpg",
+    "duration": 51,
+    "width": 1920,
+    "height": 1080,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/hdr-2-sdr/5edf246bf2694cfd1a325ae2a4dbd1331baecbbd/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-15.jpg",
+    "duration": 32,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/hdr-2-sdr/509a0de0eea572e353d6d9d740e6a0413f3ac13d/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-16.jpg",
+    "duration": 22,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/904b0bf24a38876f0884f91890dbd545319d2a68/master.m3u8",
+    "source": "2GIS"
+  },
+  {
+    "file": "2gis-video-covers/video-17.jpg",
+    "duration": 13,
+    "width": 1080,
+    "height": 1920,
+    "hls": "https://filekeeper-vod.2gis.com/26111965-aeba-4b14-bf72-9493fc57c9fb-2s-2gis-ugc-vod-transcoded/sdr-2-sdr/d0f11436128a374f4b8bf45f6194d3c24e11f3ec/master.m3u8",
+    "source": "2GIS"
+  }
+]

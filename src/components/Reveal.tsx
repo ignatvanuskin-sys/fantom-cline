@@ -29,9 +29,11 @@ export default function Reveal({
 
     // Страховка №1: без IntersectionObserver элемент ждал бы вечно.
     // Раньше это означало чёрный экран, теперь — обычный видимый контент.
+    // Показываем через таймаут, а не синхронно: setState прямо в теле эффекта
+    // запускает каскадный рендер, которого здесь не требуется.
     if (typeof IntersectionObserver === "undefined") {
-      setVisible(true);
-      return;
+      const fallback = window.setTimeout(() => setVisible(true), 0);
+      return () => window.clearTimeout(fallback);
     }
 
     // IntersectionObserver дешевле и стабильнее, чем scroll-листенеры

@@ -262,11 +262,13 @@ function WhoPicker({
   const max = quest?.maxPlayers ?? 8;
 
   return (
+    // Подписи полей — тоже цели нажатия: py-1 поднимает их высоту до 25px,
+    // иначе кликабельная подпись мельче минимального размера цели (WCAG 2.5.8).
     <div className={stack ? "space-y-6" : "grid gap-5 sm:grid-cols-2"}>
       <div>
         <label
           htmlFor="players"
-          className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
+          className="mb-1 block py-1 text-[11px] uppercase tracking-[0.25em] text-faint-text"
         >
           Игроков
         </label>
@@ -312,7 +314,7 @@ function WhoPicker({
         <div>
           <label
             htmlFor="name"
-            className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
+            className="mb-1 block py-1 text-[11px] uppercase tracking-[0.25em] text-faint-text"
           >
             Ваше имя
           </label>
@@ -331,7 +333,7 @@ function WhoPicker({
         <div>
           <label
             htmlFor="phone"
-            className="mb-2 block text-[11px] uppercase tracking-[0.25em] text-faint-text"
+            className="mb-1 block py-1 text-[11px] uppercase tracking-[0.25em] text-faint-text"
           >
             Телефон
           </label>

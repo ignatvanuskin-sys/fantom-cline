@@ -1,7 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import SpotlightCard from "@/components/reactbits/SpotlightCard";
+import { QUEST_MEDIA } from "@/data/media";
 import type { Quest } from "@/data/quests";
+
+// Комнаты без медиа не бывает: подборка собрана для всех шести.
+// Если ключ потеряется, лучше упасть на сборке, чем показать пустой прямоугольник.
+const FALLBACK = QUEST_MEDIA["sanatorium"];
 
 /**
  * Карточка квеста.
@@ -19,6 +25,8 @@ export default function QuestCard({
   index: number;
   onOpen: (quest: Quest) => void;
 }) {
+  const cover = (QUEST_MEDIA[quest.id] ?? FALLBACK).cover;
+
   return (
     <article className="group relative h-full">
       {/* React Bits: SpotlightCard — за курсором идёт кровавое пятно,
@@ -32,24 +40,25 @@ export default function QuestCard({
         className="relative flex h-full flex-col overflow-hidden border border-iron bg-smoke transition-all duration-500 hover:border-blood-700/60 hover:shadow-[0_0_50px_-12px_rgba(138,3,3,0.55)]"
         style={{ animationDelay: `${index * 60}ms` }}
       >
-        {/* Обложка. TODO: заменить на реальное фото комнаты. */}
+        {/* Обложка — реальный кадр комнаты из 2ГИС. */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-ash">
-          <div
-            className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,#201512_0%,#0f0d0c_60%,#0a0a0a_100%)]"
-            aria-hidden="true"
+          <Image
+            src={cover.src}
+            alt={cover.alt}
+            fill
+            loading={index < 3 ? "eager" : "lazy"}
+            sizes="(max-width: 640px) 78vw, (max-width: 1024px) 46vw, 31vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.05]"
           />
-          {/* duotone-эффект на превью */}
+          {/* duotone: кадр уходит в кровь, как и остальной сайт */}
           <div
-            className="absolute inset-0 bg-blood-700/10 mix-blend-color"
             aria-hidden="true"
+            className="absolute inset-0 bg-blood-900/30 mix-blend-color"
           />
+          <div aria-hidden="true" className="absolute inset-0 bg-void/25" />
           <div
-            className="absolute inset-0 opacity-30 transition-transform duration-700 group-hover:scale-105"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(115deg, transparent 0 6px, rgba(0,0,0,0.35) 6px 7px)",
-            }}
             aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-t from-smoke via-transparent to-void/40"
           />
           {/* Доминантная метка */}
           <div className="absolute left-3 top-3 flex items-center gap-1.5 bg-void/85 px-2.5 py-1 backdrop-blur-sm">

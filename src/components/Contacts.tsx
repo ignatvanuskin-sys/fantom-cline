@@ -94,6 +94,25 @@ export default function Contacts() {
                 </dd>
               </div>
 
+              <div className="border-t border-iron pt-6">
+                <dt className="text-[11px] uppercase tracking-[0.25em] text-faint-text">
+                  WhatsApp
+                </dt>
+                <dd className="mt-1.5">
+                  {/* Тот же номер, что и в 2ГИС: WhatsApp-ссылка на карточке
+                      ведёт на wa.me/77001538584 — здесь не дублируем номер
+                      текстом, чтобы не расходились данные. */}
+                  <a
+                    href={BUSINESS.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="-my-1.5 inline-flex min-h-11 items-center py-1.5 text-lg text-ash-text transition-colors hover:text-blood-300"
+                  >
+                    Написать в WhatsApp
+                  </a>
+                </dd>
+              </div>
+
               {/* Рейтинг 2ГИС — реальные данные, подтверждено 27.09.2026 */}
               <div className="border-t border-iron pt-6">
                 <dt className="text-[11px] uppercase tracking-[0.25em] text-faint-text">

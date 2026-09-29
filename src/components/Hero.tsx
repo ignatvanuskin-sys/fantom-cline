@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ShaderBackground } from "@/components/ui/gem-smoke-diamond";
 import ClickSpark from "@/components/reactbits/ClickSpark";
 import DecryptedText from "@/components/reactbits/DecryptedText";
@@ -9,6 +10,7 @@ import GradualBlur from "@/components/reactbits/GradualBlur";
 import DotMatrix from "@/components/horror/DotMatrix";
 import { BatGlyph, GothicDivider } from "@/components/horror/Gothic";
 import { sfx } from "@/components/horror/SoundToggle";
+import { HERO_PHOTO } from "@/data/media";
 import { BUSINESS } from "@/data/quests";
 
 /**
@@ -92,15 +94,30 @@ export default function Hero() {
         <ShaderBackground className="h-full w-full" />
       </div>
 
-      {/* Фон. TODO: заменить на реальное фото/видео комнаты (см. README).
-          Сейчас — CSS-градиент, чтобы макет был полностью рабочим. */}
+      {/* Фон — реальный кадр из зала (2ГИС, роспись «Теория зла»).
+          Это не декорация: первое, что видит гость, — настоящая комната,
+          в которую он собирается войти. Поверх неё лежат слои, которые
+          гасят свет и добавляют глубину: одна фотография без обработки
+          на тёмной странице смотрелась бы как чужеродное светлое пятно. */}
       <div
         aria-hidden="true"
-        className={`absolute inset-0 -z-10 transition-opacity duration-100 ${
+        className={`absolute inset-0 -z-10 overflow-hidden transition-opacity duration-100 ${
           flickerOn ? "opacity-30" : "opacity-100"
         }`}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,#1a1210_0%,#0d0d0d_45%,#0a0a0a_100%)]" />
+        <div className="absolute -inset-[6%] animate-drift">
+          <Image
+            src={HERO_PHOTO.src}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
+        {/* Гасим кадр: иначе текст заголовка теряется на росписи */}
+        <div className="absolute inset-0 bg-void/72" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(26,18,16,0.35)_0%,#0d0d0d_55%,#0a0a0a_100%)]" />
         {/* Лампа в конце коридора — с эффектом агонии (мерцает, потом оживает) */}
         <div className="absolute left-1/2 top-[38%] h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blood-900/30 blur-3xl animate-lamp" />
         {/* пыль/туман — параллакс-слой, медленнее переднего плана */}
@@ -204,8 +221,14 @@ export default function Hero() {
           <BatGlyph className="h-3 w-6 text-blood-700/60" />
         </div>
 
+        {/* min-h резервирует место под самую длинную фазу «расшифровки»:
+            пока DecryptedText подменяет буквы, ширина строк меняется и текст
+            на секунду занимает на строку больше. Без резерва этот лишний
+            перенос толкал вниз кнопки — это и давало CLS 0.13–0.18 на телефоне.
+            Значения подобраны по замеру: 4 строки на мобильном, 3 на sm+.
+            Компенсируем отступом кнопок ниже (mt-3 вместо mt-7 на мобильном). */}
         <p
-          className={`mt-5 max-w-md text-balance text-base leading-relaxed text-ash-text/85 transition-opacity duration-1000 sm:mt-6 sm:text-lg ${
+          className={`mt-5 min-h-[7rem] max-w-md text-balance text-base leading-relaxed text-ash-text/85 transition-opacity duration-1000 sm:mt-6 sm:min-h-[5.75rem] sm:text-lg ${
             titleIn ? "opacity-100" : "opacity-0"
           }`}
           style={{ transitionDelay: "700ms" }}
@@ -221,7 +244,7 @@ export default function Hero() {
         </p>
 
         <div
-          className={`mt-7 flex w-full flex-col items-stretch gap-3 transition-opacity duration-1000 sm:mt-9 sm:w-auto sm:flex-row ${
+          className={`mt-3 flex w-full flex-col items-stretch gap-3 transition-opacity duration-1000 sm:mt-9 sm:w-auto sm:flex-row ${
             titleIn ? "opacity-100" : "opacity-0"
           }`}
           style={{ transitionDelay: "900ms" }}

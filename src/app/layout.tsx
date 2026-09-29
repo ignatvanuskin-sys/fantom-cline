@@ -25,7 +25,9 @@ const DESCRIPTION =
   "Хоррор-квест в Усть-Каменогорске. Дверь закроется, свет погаснет — 60 минут, чтобы выбраться. Онлайн-запись за минуту.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://fantom-uka.vercel.app"), // TODO: заменить на домен клиента
+  // Текущий адрес сборки на Vercel. TODO: заменить на домен клиента,
+  // когда он появится — metadataBase влияет на все абсолютные ссылки в OG.
+  metadataBase: new URL("https://fantom-cline.vercel.app"),
   title: {
     default: TITLE,
     template: `%s — ${BUSINESS.name}`,
@@ -45,13 +47,20 @@ export const metadata: Metadata = {
     siteName: BUSINESS.name,
     title: TITLE,
     description: DESCRIPTION,
-    // TODO: заменить на реальное OG-изображение 1200×630
-    images: ["/og.jpg"],
+    images: [
+      {
+        url: "/og.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Роспись «Теория зла» в зале квест-рума Fantom",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
+    images: ["/og.jpg"],
   },
   robots: { index: true, follow: true },
   alternates: { canonical: "/" },

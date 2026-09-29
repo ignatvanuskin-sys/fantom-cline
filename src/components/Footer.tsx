@@ -5,6 +5,8 @@ import { BUSINESS } from "@/data/quests";
 
 const NAV = [
   { href: "#quests", label: "Квесты" },
+  { href: "#gallery", label: "Галерея" },
+  { href: "#video", label: "Видео" },
   { href: "#how", label: "Как проходит" },
   { href: "#reviews", label: "Отзывы" },
   { href: "#booking", label: "Запись" },
@@ -53,7 +55,9 @@ export default function Footer() {
                 <li>
                   <a
                     href={`tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}`}
-                    className="transition-colors hover:text-blood-300"
+                    // py-1 + min-h-11 = тач-таргет ~44px: номер в подвале
+                    // раньше был ссылкой высотой 17px и не попадал под палец
+                    className="-my-1 inline-flex min-h-11 items-center py-1 transition-colors hover:text-blood-300"
                   >
                     {BUSINESS.phone}
                   </a>
@@ -67,6 +71,25 @@ export default function Footer() {
             <p className="mb-3 text-[11px] uppercase tracking-[0.25em] text-faint-text">
               Мы здесь
             </p>
+            <a
+              href={BUSINESS.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tap-target mb-3 inline-flex items-center gap-2 text-sm text-dim-text transition-colors hover:text-blood-300"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3Z"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                />
+                <path
+                  d="M8.8 9.2c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.5l.7 1.6c.1.3 0 .5-.1.7l-.5.6c-.1.2-.2.3 0 .6.3.5.9 1.3 1.7 1.8.8.5 1 .5 1.2.4l.6-.6c.2-.2.4-.2.6-.1l1.6.8c.3.2.4.3.4.5 0 .6-.3 1.3-1.3 1.4-1.1.1-2.7-.5-4.3-2-1.6-1.5-2.2-3-2.1-4 0-.6.4-1.2.7-1.7Z"
+                  fill="currentColor"
+                />
+              </svg>
+              WhatsApp
+            </a>
             <a
               href={BUSINESS.instagramUrl}
               target="_blank"
