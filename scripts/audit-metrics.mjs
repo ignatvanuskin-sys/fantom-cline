@@ -95,20 +95,50 @@ const PROBE = `
   }).observe({ type: "layout-shift", buffered: true });
   new PerformanceObserver((l) => {
     const es = l.getEntries();
-    window.__lcp = es[es.length - 1].startTime;
+    const e = es[es.length - 1];
+    window.__lcp = e.startTime;
+    // Копим ВСЕ кандидаты: по последовательности видно, кто «перебил» кого
+    // и на какой секунде — иначе непонятно, что именно тормозит отрисовку.
+    window.__lcpAll = (window.__lcpAll || []).concat(
+      es.map((x) => ({
+        t: Math.round(x.startTime),
+        size: x.size || 0,
+        tag: x.element ? x.element.tagName.toLowerCase() : "?",
+        cls: x.element && x.element.className ? String(x.element.className).slice(0, 40) : "",
+      })),
+    );
+    // Кто именно оказался самым крупным элементом: без этого видно
+    // только время и непонятно, что ускорять.
+    window.__lcpInfo = {
+      url: e.url || "",
+      tag: e.element ? e.element.tagName.toLowerCase() : "?",
+      cls: e.element && e.element.className ? String(e.element.className).slice(0, 70) : "",
+      size: e.size || 0,
+      renderTime: Math.round(e.renderTime || 0),
+      loadTime: Math.round(e.loadTime || 0),
+      box: e.element
+        ? (() => {
+            const r = e.element.getBoundingClientRect();
+            return Math.round(r.width) + "x" + Math.round(r.height);
+          })()
+        : "",
+      html: e.element ? String(e.element.outerHTML).slice(0, 110) : "",
+    };
   }).observe({ type: "largest-contentful-paint", buffered: true });
 `;
 
 await send("Page.enable");
 await send("Runtime.enable");
 
+// Регистрируем пробник РОВНО ОДИН РАЗ. Если делать это внутри цикла по
+// ширинам, на второй итерации отработают уже два наблюдателя и будут
+// писать в один и тот же счётчик — CLS выйдет завышенным вдвое.
+await send("Page.addScriptToEvaluateOnNewDocument", { source: PROBE });
+
 for (const width of [375, 414]) {
   await send("Emulation.setDeviceMetricsOverride", {
     width, height: 812, deviceScaleFactor: 2, mobile: true,
   });
-  await send("Page.navigate", { url: "about:blank" });
-  await sleep(200);
-  await send("Page.addScriptToEvaluateOnNewDocument", { source: PROBE });
   await send("Page.navigate", { url: URL_TO_CHECK });
 
   for (let i = 0; i < 80; i++) {
@@ -117,7 +147,16 @@ for (const width of [375, 414]) {
     if (ready === "complete" && hero) break;
     await sleep(250);
   }
-  await sleep(2500);
+  // LCP читаем ДО прокрутки. Элементы, въехавшие в кадр при скролле,
+  // тоже становятся кандидатами — если мерить после прокрутки, к времени
+  // добавляются секунды, которых у реального посетителя первого экрана нет.
+  await sleep(3000);
+  const lcp = await evaluate(
+    "({ t: Math.round(window.__lcp || 0), info: window.__lcpInfo || null, all: (window.__lcpAll || []).slice(-8) })",
+  );
+
+  // А это уже нужно CLS: сдвиги бывают и в нижних секциях, которые
+  // без прокрутки просто не отрисовываются.
   await evaluate(
     `(async () => { for (let y = 0; y < document.body.scrollHeight; y += 700) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 70)); } window.scrollTo(0,0); })()`,
   );
@@ -126,12 +165,25 @@ for (const width of [375, 414]) {
   const out = await evaluate(
     `({ cls: Math.round((window.__cls || 0) * 10000) / 10000,
         lcp: Math.round(window.__lcp || 0),
+        lcpInfo: window.__lcpInfo || null,
         height: document.body.scrollHeight,
         shifts: (window.__shifts || []).slice().sort((a, b) => b.v - a.v).slice(0, 4) })`,
   );
   console.log(
-    `w=${width}  CLS=${out.cls}  LCP=${out.lcp}ms  pageHeight=${out.height}px`,
+    `w=${width}  CLS=${out.cls}  LCP=${lcp.t}ms  pageHeight=${out.height}px`,
   );
+  if (lcp.info) {
+    console.log(
+      `   LCP-элемент: <${lcp.info.tag}> ${lcp.info.cls} ` +
+        `box=${lcp.info.box} size=${lcp.info.size} render=${lcp.info.renderTime}ms ${lcp.info.url}`,
+    );
+  }
+  if (lcp.all && lcp.all.length) {
+    console.log(
+      "   кандидаты LCP: " +
+        lcp.all.map((c) => `${c.t}ms/${c.size}/<${c.tag}>`).join(", "),
+    );
+  }
   for (const s of out.shifts) {
     const who = s.s.map((x) => `<${x.tag}> ${x.cls}`).join(" | ");
     console.log(`   SHIFT ${s.v} @${s.t}ms  ${who}`);

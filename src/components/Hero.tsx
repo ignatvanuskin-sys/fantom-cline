@@ -201,10 +201,13 @@ export default function Hero() {
               key={i}
               aria-hidden="true"
               className="inline-block"
+              // Анимация задана CSS-кадрами, а не переходом от состояния
+              // React: заголовок — самый крупный элемент первого экрана,
+              // и удерживать его невидимым до гидратации означает отдать
+              // LCP в чужие руки. fill-mode both держит начальный кадр
+              // до старта задержки.
               style={{
-                opacity: titleIn ? 1 : 0,
-                transform: titleIn ? "none" : "translate3d(0,24px,0)",
-                transition: `opacity 500ms ease ${i * 90}ms, transform 500ms cubic-bezier(0.16,1,0.3,1) ${i * 90}ms`,
+                animation: `letter-in 500ms cubic-bezier(0.16,1,0.3,1) ${i * 70}ms both`,
                 textShadow: "0 0 40px rgba(184,18,26,0.5)",
               }}
             >

@@ -118,6 +118,22 @@
   }
 }
 
+/* Появление букв главного заголовка.
+   Анимация на CSS, а не на состоянии React: пока буквы ждали гидратации,
+   самый большой элемент страницы оставался невидимым, и LCP уезжал
+   за четыре секунды. CSS-анимация стартует от первой отрисовки разметки
+   и от загрузки JS не зависит. */
+@keyframes letter-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Подсветка «избранной» карточки по контуру. */
 @keyframes glow {
   0%,
@@ -591,6 +607,11 @@ input[type="number"]::-webkit-inner-spin-button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.15s !important;
+    /* Задержки тоже обнуляем: с ними контент с fill-mode «both»
+       оставался невидимым до конца задержки (до 1.2s), а это ровно то,
+       от чего prefers-reduced-motion и защищает. */
+    animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
   }
   /* Оставляем мягкое появление без тряски/flicker */
   .reveal-dark {
