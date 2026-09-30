@@ -63,15 +63,11 @@ export default function QuestModal({
         ref={panelRef}
         // overscroll-contain: докрутив карточку до конца, палец не должен
         // начинать прокручивать страницу под ней — иначе модалка «уезжает»
-        className="relative max-h-[88svh] w-full max-w-2xl overflow-y-auto overscroll-contain border border-iron bg-ash shadow-[0_0_80px_-10px_rgba(138,3,3,0.4)]"
-        style={{ animation: "modal-in 0.35s cubic-bezier(0.16,1,0.3,1)" }}
+        // modal-in — общая утилита из globals.css: раньше анимация была
+        // прописана здесь инлайном, и её нельзя было ни переиспользовать,
+        // ни сделать исключение для режима «уменьшить движение»
+        className="modal-in relative max-h-[88svh] w-full max-w-2xl overflow-y-auto overscroll-contain border border-iron bg-ash shadow-[0_0_80px_-10px_rgba(138,3,3,0.4)]"
       >
-        <style>{`
-          @keyframes modal-in {
-            from { opacity: 0; transform: translate3d(0,40px,0) scale(0.97); filter: blur(8px); }
-            to   { opacity: 1; transform: none; filter: blur(0); }
-          }
-        `}</style>
 
         {/* Сцена комнаты. Пока кадр один: миниатюры, которые переключали
             четыре кадра, стали бессмысленны, а лишние кнопки в модалке

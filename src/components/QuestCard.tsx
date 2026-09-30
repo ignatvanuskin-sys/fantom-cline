@@ -40,7 +40,9 @@ export default function QuestCard({
         spotlightSize={420}
       >
       <div
-        className="relative flex h-full flex-col overflow-hidden border border-iron bg-smoke transition-[border-color,box-shadow] duration-500 hover:border-blood-700/60 hover:shadow-[0_0_50px_-12px_rgba(138,3,3,0.55)]"
+        // active: — отклик на касание: на телефоне наведения нет, и без него
+        // карточка не подтверждает, что палец вообще попал по ней
+        className="relative flex h-full flex-col overflow-hidden border border-iron bg-smoke transition-[border-color,box-shadow] duration-500 active:border-blood-700/60 hover:border-blood-700/60 hover:shadow-[0_0_50px_-12px_rgba(138,3,3,0.55)]"
         style={{ animationDelay: `${index * 60}ms` }}
       >
         {/* Подсветка по контуру у «хита»: карточка дышит, а не просто

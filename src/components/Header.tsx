@@ -220,7 +220,8 @@ export default function Header() {
           role="dialog"
           aria-modal="true"
           aria-label="Меню"
-          className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-void/98 backdrop-blur-xl lg:hidden"
+          // menu-in: панель проявляется, а не возникает одним кадром
+          className="menu-in fixed inset-0 z-[60] flex flex-col overflow-hidden bg-void/98 backdrop-blur-xl lg:hidden"
         >
           <div className="flex shrink-0 items-center justify-between border-b border-iron px-5 py-3">
             <span className="text-xs uppercase tracking-[0.24em] text-dim-text">
@@ -241,12 +242,15 @@ export default function Header() {
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
             <nav aria-label="Мобильная навигация" className="px-5 py-4">
               <ul>
-                {NAV.map((n) => (
+                {NAV.map((n, i) => (
                   <li key={n.href} className="border-b border-iron/60 last:border-b-0">
                     <a
                       href={n.href}
                       onClick={() => setMenuOpen(false)}
-                      className="flex min-h-[52px] items-center font-display text-[clamp(1.45rem,7.6vw,2.2rem)] uppercase leading-tight text-ash-text transition-colors active:text-blood-300"
+                      // Пункты поднимаются волной: 45ms между соседними —
+                      // читается как движение, но не задерживает открытие
+                      className="menu-in flex min-h-[52px] items-center font-display text-[clamp(1.45rem,7.6vw,2.2rem)] uppercase leading-tight text-ash-text transition-colors active:text-blood-300"
+                      style={{ animationDelay: `${60 + i * 45}ms` }}
                     >
                       {n.label}
                     </a>
@@ -255,7 +259,10 @@ export default function Header() {
               </ul>
             </nav>
 
-            <div className="mt-auto space-y-3 border-t border-iron px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-5">
+            <div
+              className="menu-in mt-auto space-y-3 border-t border-iron px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-5"
+              style={{ animationDelay: "230ms" }}
+            >
               {/* На телефоне звук всегда под рукой в меню, а не в шапке */}
               <SoundToggle />
               <a

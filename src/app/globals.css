@@ -681,7 +681,20 @@ input[type="number"]::-webkit-inner-spin-button {
     transition: translate 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  &:hover::after,
+  /* На телефоне наведения нет вовсе: блик запускаем ещё и от нажатия,
+     иначе на тач-устройстве кнопка на касание никак не отвечает. */
+  &:active::after {
+    translate: 130% 0;
+  }
+
+  /* hover — только там, где курсор действительно есть: на тач-экранах
+     браузер «залипает» в hover после тапа. */
+  @media (hover: hover) {
+    &:hover::after {
+      translate: 130% 0;
+    }
+  }
+
   &:focus-visible::after {
     translate: 130% 0;
   }
@@ -727,6 +740,79 @@ input[type="number"]::-webkit-inner-spin-button {
   }
 }
 
+/* --- Переход между шагами мастера записи (телефон) ---
+   Раньше смена шага происходила мгновенно: экран перерисовывался рывком,
+   и не было понятно, вперёд ты пошёл или назад. Теперь новый шаг въезжает
+   со стороны движения — вперёд справа, назад слева. Только transform/opacity. */
+@keyframes step-fwd {
+  from {
+    opacity: 0;
+    transform: translate3d(18px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes step-back {
+  from {
+    opacity: 0;
+    transform: translate3d(-18px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility step-in {
+  animation: step-fwd 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility step-in-back {
+  animation: step-back 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Появление полноэкранного меню на телефоне ---
+   Панель возникала одним кадром; теперь проявляется, а пункты поднимаются
+   по очереди — короткий «вдох» вместо переключения картинки. */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility menu-in {
+  animation: menu-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Модалка квеста ---
+   На телефоне выезжает снизу, как шторка: раньше анимация была прописана
+   инлайном внутри компонента, и её нельзя было ни переиспользовать,
+   ни сделать исключение для режима «уменьшить движение». */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0) scale(0.97);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@utility modal-in {
+  animation: modal-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* --- Доступность: отключаем «пугающую» анимацию --- */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -749,9 +835,32 @@ input[type="number"]::-webkit-inner-spin-button {
     filter: none;
     transform: none;
   }
-  /* Блик — чистый декор: без него кнопка читается так же */
+}
+
+/* --- Исключения из «уменьшения движения» (просьба владельца) ---
+   Владелец держит на своём телефоне режим «уменьшить движение», но хочет
+   видеть отклик интерфейса: иначе на телефоне сайт выглядит статичным.
+   Возвращаем движение только там, где оно короткое и запускается действием
+   человека — тапом, а не играет само по себе.
+   Всё декоративное, что живёт без участия гостя (мерцание, дрейф фона,
+   точечное табло, пульс лампы), по-прежнему выключено. */
+@media (prefers-reduced-motion: reduce) {
+  /* Кромка главной кнопки продолжает бежать по контуру */
+  .edge-run::before {
+    animation-duration: 4.2s !important;
+    animation-iteration-count: infinite !important;
+  }
+  /* Блик проходит по кнопке после касания */
   .shine::after {
-    display: none;
+    transition-duration: 0.75s !important;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  /* Смена шага мастера, появление меню и модалки квеста */
+  .step-in,
+  .step-in-back,
+  .menu-in,
+  .modal-in {
+    animation-duration: 0.34s !important;
   }
 }
 

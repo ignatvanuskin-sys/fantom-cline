@@ -77,7 +77,7 @@ function QuestPicker({
         {QUESTS.map((q) => (
           <label
             key={q.id}
-            className={`control-focus flex w-[72vw] shrink-0 snap-center cursor-pointer flex-col border p-4 transition-colors ${
+            className={`control-focus flex w-[72vw] shrink-0 snap-center cursor-pointer flex-col border p-4 transition-colors active:border-blood-500 ${
               questId === q.id
                 ? "border-blood-700 bg-blood-900/15"
                 : "border-iron"
@@ -121,7 +121,7 @@ function QuestPicker({
       {QUESTS.map((q) => (
         <label
           key={q.id}
-          className={`control-focus flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-colors ${
+          className={`control-focus flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-colors active:border-blood-500 ${
             questId === q.id
               ? "border-blood-700 bg-blood-900/15"
               : "border-iron hover:border-blood-700/50"
@@ -193,7 +193,7 @@ function WhenPicker({
           {dates.map((d) => (
             <label
               key={d.iso}
-              className={`control-focus relative flex min-w-[4.5rem] shrink-0 snap-center cursor-pointer flex-col items-center border py-3 transition-colors sm:min-w-0 ${
+              className={`control-focus relative flex min-w-[4.5rem] shrink-0 snap-center cursor-pointer flex-col items-center border py-3 transition-colors active:border-blood-500 sm:min-w-0 ${
                 date === d.iso
                   ? "border-blood-700 bg-blood-900/20"
                   : "border-iron hover:border-blood-700/50"
@@ -236,7 +236,7 @@ function WhenPicker({
           {TIME_SLOTS.map((t) => (
             <label
               key={t}
-              className={`control-focus tap-target flex cursor-pointer items-center justify-center border text-base transition-[border-color,background-color,color,box-shadow] duration-300 ${
+              className={`control-focus tap-target flex cursor-pointer items-center justify-center border text-base transition-[border-color,background-color,color,box-shadow] duration-300 active:border-blood-500 ${
                 time === t
                   ? "border-blood-700 bg-blood-700 text-ash-text shadow-[0_0_24px_-6px_rgba(184,18,26,0.9)]"
                   : "border-iron text-dim-text hover:border-blood-500 hover:bg-blood-900/10 hover:text-ash-text"
@@ -450,6 +450,9 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
   // Номер шага мастера. Актуален только на телефоне: на десктопе форма
   // показывается целиком и значение игнорируется.
   const [stepIndex, setStepIndex] = useState(0);
+  // Направление последнего перехода: 1 — вперёд, -1 — назад. По нему новый
+  // шаг въезжает с нужной стороны, и направление читается без подписи.
+  const [stepDir, setStepDir] = useState<1 | -1>(1);
   const isMobile = useIsMobile();
 
   const quest: Quest | undefined = QUESTS.find((q) => q.id === questId);
@@ -469,6 +472,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         setStatus("idle");
         // Квест уже выбран за пользователя — на телефоне сразу показываем
         // шаг «Когда», чтобы не заставлять подтверждать очевидное
+        setStepDir(1);
         setStepIndex(1);
       }
     };
@@ -605,10 +609,15 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         </div>
 
         <h3
-          className="font-display text-3xl text-ash-text sm:text-4xl"
+          // Кегль подобран под самую длинную строку экрана: «закомпостировано»
+          // при 30px не влезало в 324px контента и рвалось посередине слова
+          // («Место / закомпостирова / но»). Мягкий перенос — страховка для
+          // узких экранов вроде 320px: если не влезет, слово разорвётся
+          // по слогу, а не как попало.
+          className="font-display text-[clamp(1.3rem,6.8vw,2.25rem)] text-balance text-ash-text sm:text-4xl"
           style={{ animation: "fade-up 0.5s 0.1s both" }}
         >
-          Место закомпостировано
+          Место закомпости&shy;ровано
         </h3>
         <p
           className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-ash-text/85"
@@ -642,6 +651,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
             setStatus("idle");
             setTime("");
             setError("");
+            setStepDir(-1);
             setStepIndex(0);
           }}
           className="tap-target mt-7 border border-iron px-6 py-3 text-xs uppercase tracking-[0.15em] text-dim-text transition-colors hover:border-blood-700 hover:text-ash-text"
@@ -708,6 +718,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         if (!field && isMobile) {
           // Поля нет в разметке — значит, мы не на шаге «Когда». Переводим
           // туда, иначе человек читает про время, не видя выбора времени.
+          setStepDir(-1);
           setStepIndex(1);
           requestAnimationFrame(() => {
             document
@@ -723,6 +734,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
     }
 
     setError("");
+    setStepDir(next >= step ? 1 : -1);
     setStepIndex(next);
 
     // Прокручиваем уже после отрисовки нового шага, иначе браузер
@@ -788,12 +800,19 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
                 aria-label={`Шаг ${i + 1}: ${s.label}`}
                 aria-current={i === step ? "step" : undefined}
               >
+                {/* Полоска шага: серая дорожка + заливка, которая выезжает
+                    слева при переходе. transform, а не width — кадр считает
+                    композитор, перерисовки нет. */}
                 <span
-                  className={`block h-1 w-full transition-colors ${
-                    i <= step ? "bg-blood-500" : "bg-iron"
-                  }`}
-
-                />
+                  aria-hidden="true"
+                  className="relative block h-1 w-full overflow-hidden bg-iron"
+                >
+                  <span
+                    className={`absolute inset-y-0 left-0 w-full origin-left bg-blood-500 transition-transform duration-500 ease-out ${
+                      i <= step ? "scale-x-100" : "scale-x-0"
+                    }`}
+                  />
+                </span>
               </button>
             ))}
           </div>
@@ -809,6 +828,15 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
       )}
 
 
+      {/* Содержимое текущего шага. key перезапускает анимацию при переходе:
+          без него React переиспользует узел и анимация не проигрывается.
+          На десктопе ключ постоянный — там форма одна и не переключается. */}
+      <div
+        key={isMobile ? `step-${step}` : "all"}
+        className={
+          isMobile ? (stepDir === 1 ? "step-in" : "step-in-back") : undefined
+        }
+      >
       {/* ---------- Шаг 1: квест ---------- */}
       {(!isMobile || step === 0) && (
         <div className="mb-6 min-w-0">
@@ -852,6 +880,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
           />
         </div>
       )}
+      </div>
 
       {error && (
         <p
@@ -944,7 +973,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
           <button
             type="button"
             onClick={() => goToStep(step + 1)}
-            className="tap-target flex flex-1 items-center justify-center bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,transform] duration-200 active:scale-[0.98] active:bg-blood-500"
+            className="shine tap-target flex flex-1 items-center justify-center bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,transform] duration-200 active:scale-[0.98] active:bg-blood-500"
           >
             Далее
           </button>
