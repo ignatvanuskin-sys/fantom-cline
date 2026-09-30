@@ -56,7 +56,8 @@ export default function Reviews() {
                     href={BUSINESS.mapUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="-my-1 inline-flex min-h-11 items-center py-1 text-[10px] uppercase tracking-[0.18em] text-faint-text underline decoration-iron underline-offset-4 transition-colors hover:text-blood-300"
+                    // min-w-11: без него тач-цель по ширине ~30px, меньше 44px
+                    className="-my-1 inline-flex min-h-11 min-w-11 items-center justify-center px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-faint-text underline decoration-iron underline-offset-4 transition-colors hover:text-blood-300"
                   >
                     {r.source}
                   </a>

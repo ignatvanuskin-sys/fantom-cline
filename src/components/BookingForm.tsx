@@ -27,6 +27,13 @@ function buildDates() {
 /** Маска ввода казахстанского номера: +7 (777) 123-45-67 */
 function formatPhone(raw: string) {
   let digits = raw.replace(/\D/g, "");
+  // Вставка номера без кода страны: «7771234567» — это национальный номер
+  // 7XX XXX XX XX. Отличаем вставку от посимвольного набора по отсутствию
+  // любых разделителей: при наборе в поле уже стоит «+7 », поэтому цифр
+  // набирается одиннадцать и правило не срабатывает.
+  if (/^\d+$/.test(raw) && digits.length === 10 && digits.startsWith("7")) {
+    digits = "7" + digits;
+  }
   if (digits.startsWith("8")) digits = "7" + digits.slice(1);
   if (!digits.startsWith("7")) digits = "7" + digits;
   digits = digits.slice(0, 11);
@@ -40,6 +47,10 @@ function formatPhone(raw: string) {
   if (p.length > 8) out += `-${p.slice(8, 10)}`;
   return out;
 }
+
+/** Текст ошибки про согласие: нужен и при отправке, и при снятии галочки. */
+const CONSENT_ERROR =
+  "Отметьте согласие на обработку данных — без него не сможем принять заявку.";
 
 /* ============================================================
    Подкомпоненты шагов формы
@@ -484,7 +495,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
             ? "Проверьте номер: нужно 11 цифр, начиная с 7."
             : problem === "time"
               ? "Выберите время — от часа зависит, сколько мест осталось."
-              : "Отметьте согласие на обработку данных — без него не сможем принять заявку.";
+              : CONSENT_ERROR;
 
       const field =
         problem === "time"
@@ -594,8 +605,13 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         <button
           type="button"
           onClick={() => {
+            // «Записать ещё» — это новая запись: мастер возвращается к выбору
+            // комнаты, а время сбрасывается (час всегда выбирают заново).
+            // Имя и телефон оставляем: скорее всего записывается тот же человек.
             setStatus("idle");
             setTime("");
+            setError("");
+            setStepIndex(0);
           }}
           className="tap-target mt-7 border border-iron px-6 py-3 text-xs uppercase tracking-[0.15em] text-dim-text transition-colors hover:border-blood-700 hover:text-ash-text"
         >
@@ -632,13 +648,14 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
    */
   function goToStep(next: number) {
     if (next > step) {
-      // Проверяем только то, что закрывает ТЕКУЩИЙ шаг. Проверка «всего
-      // сразу» блокировала бы выход с шага «Квест»: время выбирают на
-      // следующем шаге, и требовать его раньше — тупик.
+      // Проверяем не текущий шаг, а тот, который перепрыгиваем: полоска
+      // шагов позволяет уйти с «Квеста» сразу на «Кто», и единственное
+      // обязательное поле — время — осталось бы невыбранным. Требовать
+      // время раньше (при выходе с «Квеста» на «Когда») по-прежнему нельзя:
+      // его и выбирают на следующем шаге.
       const missing =
-        step === 0
-          ? null
-          : !date
+        next > 1
+          ? !date
             ? {
                 attr: "date",
                 message: "Выберите день — свободные даты обновляются каждый день.",
@@ -649,13 +666,25 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
                   message:
                     "Выберите время — от часа зависит, сколько мест осталось.",
                 }
-              : null;
+              : null
+          : null;
 
       if (missing) {
         setError(missing.message);
         const field = document.querySelector<HTMLInputElement>(
           `input[name="${missing.attr}"]`,
         );
+        if (!field && isMobile) {
+          // Поля нет в разметке — значит, мы не на шаге «Когда». Переводим
+          // туда, иначе человек читает про время, не видя выбора времени.
+          setStepIndex(1);
+          requestAnimationFrame(() => {
+            document
+              .getElementById("booking")
+              ?.scrollIntoView({ block: "start", behavior: "smooth" });
+          });
+          return;
+        }
         field?.focus();
         field?.scrollIntoView({ block: "center" });
         return;
@@ -678,9 +707,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
   const chosenDate = dates.find((d) => d.iso === date);
   const summary = [
     quest?.name,
-    chosenDate
-      ? `${chosenDate.day} ${chosenDate.date}${time ? `, ${time}` : ""}`
-      : null,
+    chosenDate ? `${chosenDate.date}${time ? `, ${time}` : ""}` : null,
     `${players} ${players === 1 ? "игрок" : "игрока"}`,
   ].filter(Boolean);
 
@@ -834,7 +861,14 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
               type="checkbox"
               required
               checked={consent}
-              onChange={(e) => setConsent(e.target.checked)}
+              onChange={(e) => {
+                setConsent(e.target.checked);
+                // Сообщение про согласие снимаем сразу: причина уже
+                // устранена, а текст висел бы до следующей отправки.
+                if (e.target.checked) {
+                  setError((prev) => (prev === CONSENT_ERROR ? "" : prev));
+                }
+              }}
               // accent-color задан инлайном: это единственная галочка на
               // странице, ради неё не стоит заводить отдельный токен
               className="mt-0.5 h-4 w-4 shrink-0"
