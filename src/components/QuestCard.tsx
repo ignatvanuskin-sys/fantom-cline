@@ -57,7 +57,9 @@ export default function QuestCard({
           />
         )}
 
-        {/* Обложка — реальный кадр комнаты из 2ГИС. */}
+        {/* Обложка — сгенерированная арт-заглушка под тему комнаты, а не
+            фотография клуба (см. src/data/scenes.ts: кадры из 2ГИС не
+            подошли на роль обложек). Перед публикацией заменяется съёмкой. */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-ash">
           {/* Блик под ещё не загруженным кадром */}
           <span aria-hidden="true" className="shimmer-layer" />
