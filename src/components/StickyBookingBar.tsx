@@ -89,7 +89,7 @@ export default function StickyBookingBar() {
         <a
           href="#booking"
           data-testid="sticky-booking-cta"
-          className="tap-target flex shrink-0 items-center justify-center bg-blood-700 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-ash-text transition-[background-color,transform] duration-200 hover:bg-blood-500 active:scale-[0.97]"
+          className="tap-target shine flex shrink-0 items-center justify-center bg-blood-700 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-ash-text transition-[background-color,transform] duration-200 hover:bg-blood-500 active:scale-[0.97]"
         >
           Забронировать
         </a>

@@ -134,7 +134,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-500 ${
           scrolled
             ? "border-b border-iron bg-void/92 backdrop-blur-md"
             : "border-b border-transparent"
@@ -144,6 +144,8 @@ export default function Header() {
           <a
             href="#hero"
             aria-label="Fantom — на главную"
+            // translate="no": авто-перевод браузера не должен трогать название
+            translate="no"
             // blood-300 (#dd4448) вместо blood-500: на 24px тёмно-красный
             // давал контраст 2.96:1 при норме 3:1 для крупного текста.
             className="flex min-h-11 items-center font-display text-2xl leading-none text-blood-300 transition-colors hover:text-ash-text"
@@ -175,7 +177,7 @@ export default function Header() {
           <a
             href="#booking"
             aria-label="Записаться на квест"
-            className="tap-target hidden items-center bg-blood-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ash-text transition-[background-color,color,transform,box-shadow] duration-200 hover:bg-blood-500 active:scale-[0.97] lg:inline-flex"
+            className="shine tap-target hidden items-center bg-blood-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-ash-text transition-[background-color,color,transform,box-shadow] duration-200 hover:bg-blood-500 active:scale-[0.97] lg:inline-flex"
           >
             Записаться
           </a>
@@ -183,7 +185,7 @@ export default function Header() {
           <a
             href="#booking"
             aria-label="Записаться на квест"
-            className="tap-target flex items-center bg-blood-700 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,color,transform,box-shadow] duration-200 hover:bg-blood-500 active:scale-[0.97] lg:hidden"
+            className="shine tap-target flex items-center bg-blood-700 px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,color,transform,box-shadow] duration-200 hover:bg-blood-500 active:scale-[0.97] lg:hidden"
           >
             Запись
           </a>
@@ -259,7 +261,7 @@ export default function Header() {
               <a
                 href="#booking"
                 onClick={() => setMenuOpen(false)}
-                className="flex min-h-[56px] items-center justify-center bg-blood-700 px-6 text-sm font-semibold uppercase tracking-[0.16em] text-ash-text transition-[background-color,transform] duration-200 active:scale-[0.98] active:bg-blood-500"
+                className="shine flex min-h-[56px] items-center justify-center bg-blood-700 px-6 text-sm font-semibold uppercase tracking-[0.16em] text-ash-text transition-[background-color,transform] duration-200 active:scale-[0.98] active:bg-blood-500"
               >
                 Забронировать место
               </a>

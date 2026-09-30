@@ -17,7 +17,8 @@ export default function Footer() {
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="font-display text-3xl text-blood-300">
+            {/* translate="no": авто-перевод не должен трогать название бренда */}
+            <p className="font-display text-3xl text-blood-300" translate="no">
               {BUSINESS.name}
             </p>
             <p className="mt-2 text-sm text-dim-text">

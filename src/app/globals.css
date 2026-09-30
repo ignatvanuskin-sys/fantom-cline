@@ -638,6 +638,95 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 
+/* --- Видимый фокус с клавиатуры ---
+   Браузерное кольцо то есть, то нет: часть элементов его сохраняет, часть
+   отменяет своими стилями. Задаём одно кольцо на всю страницу и только для
+   :focus-visible — при клике мышью оно не появляется. */
+@layer base {
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-blood-500);
+    outline-offset: 2px;
+  }
+}
+
+/* Карточные радиокнопки и чекбокс: сам input скрыт (sr-only), поэтому кольцо
+   рисуем на подписи-обёртке — иначе с клавиатуры не видно, где стоишь. */
+@utility control-focus {
+  &:has(input:focus-visible) {
+    outline: 2px solid var(--color-blood-500);
+    outline-offset: 2px;
+  }
+}
+
+/* --- Блик по кнопке ---
+   Кнопка должна отвечать на курсор, а не только менять заливку. Едем
+   transform'ом (работа композитора), а не анимацией градиента: перерисовки
+   пикселей в кадре нет. */
+@utility shine {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    translate: -130% 0;
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.26) 50%,
+      transparent 62%
+    );
+    transition: translate 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    translate: 130% 0;
+  }
+}
+
+/* --- Бегущая кромка главной кнопки ---
+   Идея Aceternity moving-border, но без JS и motion-компонента: под кнопкой
+   лежит вращающийся конический градиент, кнопка закрывает его собой, и
+   снаружи остаётся живая кромка толщиной в padding обёртки.
+   Вращается transform — композитор, не перерисовка. */
+@keyframes edge-run {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@utility edge-run {
+  position: relative;
+  display: inline-flex;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 2px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: 160%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg 232deg,
+      var(--color-blood-700) 268deg,
+      var(--color-blood-500) 306deg,
+      #ffc2c4 330deg,
+      var(--color-blood-500) 352deg,
+      transparent 360deg
+    );
+    animation: edge-run 4.2s linear infinite;
+  }
+}
+
 /* --- Доступность: отключаем «пугающую» анимацию --- */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -659,6 +748,10 @@ input[type="number"]::-webkit-inner-spin-button {
   .reveal-dark {
     filter: none;
     transform: none;
+  }
+  /* Блик — чистый декор: без него кнопка читается так же */
+  .shine::after {
+    display: none;
   }
 }
 

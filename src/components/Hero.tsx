@@ -198,6 +198,8 @@ export default function Hero() {
           // 6 знаков при 15.5vw занимают ~90% ширины экрана на 320–414px.
           className="font-display text-[clamp(2.2rem,15.5vw,8rem)] leading-[0.9] text-blood-300 sm:text-[13vw] md:text-[8rem]"
           aria-label={BUSINESS.name}
+          // translate="no": название бренда не должно попадать под авто-перевод
+          translate="no"
         >
           {letters.map((letter, i) => (
             <span
@@ -260,15 +262,20 @@ export default function Hero() {
             sparkRadius={18}
             sparkCount={9}
           >
-            <a
-              href="#quests"
-              onClick={() => sfx("door")}
-              className="group tap-target relative flex items-center justify-center overflow-hidden bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-[background-color,transform] duration-200 hover:bg-blood-500 active:scale-[0.97]"
-            >
-              <span className="relative z-10">Войти, если осмелишься</span>
-              {/* «проявление из тумана» при hover */}
-              <span className="absolute inset-0 origin-bottom scale-y-0 bg-blood-900 transition-transform duration-500 ease-out group-hover:scale-y-100" />
-            </a>
+            {/* edge-run: по кромке главной кнопки медленно едет красная
+                вспышка — идея Aceternity moving-border, но без JS и
+                motion-компонента: вращается transform, работа композитора */}
+            <span className="edge-run w-full sm:w-auto">
+              <a
+                href="#quests"
+                onClick={() => sfx("door")}
+                className="shine group tap-target relative flex flex-1 items-center justify-center overflow-hidden bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-[background-color,transform] duration-200 hover:bg-blood-500 active:scale-[0.97]"
+              >
+                <span className="relative z-10">Войти, если осмелишься</span>
+                {/* «проявление из тумана» при hover */}
+                <span className="absolute inset-0 origin-bottom scale-y-0 bg-blood-900 transition-transform duration-500 ease-out group-hover:scale-y-100" />
+              </a>
+            </span>
           </ClickSpark>
 
           <ClickSpark sparkColor="#6b4a24" sparkRadius={12} sparkCount={6}>

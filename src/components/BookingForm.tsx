@@ -6,6 +6,7 @@ import GlitchText from "@/components/reactbits/GlitchText";
 import { sfx } from "@/components/horror/SoundToggle";
 import { QUESTS, TIME_SLOTS, type Quest } from "@/data/quests";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useHydrated } from "@/hooks/useHydrated";
 
 /** Ближайшие 14 дней, начиная с завтра (сегодняшний день клиенты не выбирают). */
 function buildDates() {
@@ -76,7 +77,7 @@ function QuestPicker({
         {QUESTS.map((q) => (
           <label
             key={q.id}
-            className={`flex w-[72vw] shrink-0 snap-center cursor-pointer flex-col border p-4 transition-colors ${
+            className={`control-focus flex w-[72vw] shrink-0 snap-center cursor-pointer flex-col border p-4 transition-colors ${
               questId === q.id
                 ? "border-blood-700 bg-blood-900/15"
                 : "border-iron"
@@ -120,7 +121,7 @@ function QuestPicker({
       {QUESTS.map((q) => (
         <label
           key={q.id}
-          className={`flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-colors ${
+          className={`control-focus flex cursor-pointer items-center gap-3 border px-3.5 py-3 transition-colors ${
             questId === q.id
               ? "border-blood-700 bg-blood-900/15"
               : "border-iron hover:border-blood-700/50"
@@ -175,10 +176,24 @@ function WhenPicker({
           Дата
         </legend>
         <div className="-mx-5 flex snap-x snap-mandatory gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-7 sm:gap-2 sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden">
+          {/* Скелет до гидратации: держит высоту ряда, поэтому форма
+              не прыгает, пока даты ещё не посчитаны */}
+          {dates.length === 0 &&
+            Array.from({ length: 14 }).map((_, i) => (
+              <span
+                key={i}
+                aria-hidden="true"
+                className="flex min-w-[4.5rem] shrink-0 snap-center flex-col items-center gap-1.5 border border-iron py-3 sm:min-w-0"
+              >
+                <span className="h-2.5 w-7 bg-iron" />
+                <span className="h-4 w-5 bg-iron" />
+                <span className="h-2.5 w-9 bg-iron" />
+              </span>
+            ))}
           {dates.map((d) => (
             <label
               key={d.iso}
-              className={`relative flex min-w-[4.5rem] shrink-0 snap-center cursor-pointer flex-col items-center border py-3 transition-colors sm:min-w-0 ${
+              className={`control-focus relative flex min-w-[4.5rem] shrink-0 snap-center cursor-pointer flex-col items-center border py-3 transition-colors sm:min-w-0 ${
                 date === d.iso
                   ? "border-blood-700 bg-blood-900/20"
                   : "border-iron hover:border-blood-700/50"
@@ -221,7 +236,7 @@ function WhenPicker({
           {TIME_SLOTS.map((t) => (
             <label
               key={t}
-              className={`tap-target flex cursor-pointer items-center justify-center border text-base transition-all duration-300 ${
+              className={`control-focus tap-target flex cursor-pointer items-center justify-center border text-base transition-[border-color,background-color,color,box-shadow] duration-300 ${
                 time === t
                   ? "border-blood-700 bg-blood-700 text-ash-text shadow-[0_0_24px_-6px_rgba(184,18,26,0.9)]"
                   : "border-iron text-dim-text hover:border-blood-500 hover:bg-blood-900/10 hover:text-ash-text"
@@ -301,7 +316,7 @@ function WhoPicker({
             aria-label="Меньше игроков"
             disabled={players <= min}
             onClick={() => onPlayers(Math.max(players - 1, min))}
-            className="tap-target w-14 shrink-0 text-2xl text-dim-text transition-colors active:text-blood-300 disabled:opacity-30"
+            className="tap-target w-14 shrink-0 text-2xl text-dim-text transition-colors hover:text-ash-text active:text-blood-300 disabled:opacity-30"
           >
             −
           </button>
@@ -324,7 +339,7 @@ function WhoPicker({
             aria-label="Больше игроков"
             disabled={players >= max}
             onClick={() => onPlayers(Math.min(players + 1, max))}
-            className="tap-target w-14 shrink-0 text-2xl text-dim-text transition-colors active:text-blood-300 disabled:opacity-30"
+            className="tap-target w-14 shrink-0 text-2xl text-dim-text transition-colors hover:text-ash-text active:text-blood-300 disabled:opacity-30"
           >
             +
           </button>
@@ -348,7 +363,7 @@ function WhoPicker({
             type="text"
             value={name}
             onChange={(e) => onName(e.target.value)}
-            placeholder="Как к вам обращаться"
+            placeholder="Как к вам обращаться…"
             autoComplete="name"
             required
             aria-invalid={nameError}
@@ -402,13 +417,24 @@ export type BookingFormProps = {
   initialQuestId?: string;
 };
 export default function BookingForm({ initialQuestId }: BookingFormProps) {
-  // useMemo инлайновый — buildDates создаёт новый массив дат
-  const dates = useMemo(() => buildDates(), []);
+  /*
+    Календарь считаем только в браузере.
+    Страница отдаётся статическим HTML, собранным в момент деплоя: «сегодня»
+    на сборке — не «сегодня» для гостя. Раньше 14 дней запекались в разметку,
+    и на следующий день после деплоя календарь начинался со вчерашнего числа,
+    а React ругался на расхождение гидратации. До гидратации на месте ряда —
+    скелет: он держит высоту, поэтому форма не прыгает.
+  */
+  const hydrated = useHydrated();
+  const dates = useMemo(() => (hydrated ? buildDates() : []), [hydrated]);
 
   const [questId, setQuestId] = useState<string>(
     initialQuestId ?? QUESTS[0]?.id ?? "",
   );
-  const [date, setDate] = useState<string>(dates[0]?.iso ?? "");
+  // Выбранный день храним отдельно от списка: пока календаря ещё нет,
+  // показываем ближайшую дату из посчитанного списка.
+  const [pickedDate, setPickedDate] = useState<string>("");
+  const date = pickedDate || dates[0]?.iso || "";
   const [time, setTime] = useState<string>("");
   const [players, setPlayers] = useState<number>(2);
   const [name, setName] = useState("");
@@ -547,7 +573,12 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
   /* ---------- Экран подтверждения: «дверь заперлась» ---------- */
   if (status === "done") {
     return (
-      <div className="relative border border-blood-700/50 bg-smoke p-7 text-center sm:p-12">
+      <div
+        // role=status: подтверждение появляется на месте формы, и без этого
+        // screen reader о нём просто не сообщит
+        role="status"
+        className="relative border border-blood-700/50 bg-smoke p-7 text-center sm:p-12"
+      >
         <style>{`
           @keyframes lock-shake {
             0%,100% { transform: translateX(0); }
@@ -796,7 +827,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
             date={date}
             time={time}
             onDate={(iso) => {
-              setDate(iso);
+              setPickedDate(iso);
               setTime("");
             }}
             onTime={setTime}
@@ -853,7 +884,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
         <div className="mt-6">
           <label
             htmlFor="consent"
-            className="flex cursor-pointer items-start gap-3 border border-iron bg-ash px-4 py-3.5"
+            className="control-focus flex cursor-pointer items-start gap-3 border border-iron bg-ash px-4 py-3.5"
           >
             <input
               id="consent"
@@ -930,7 +961,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
               disabled={status === "sending"}
               aria-busy={status === "sending"}
               aria-disabled={!canSubmit}
-              className="tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,transform,box-shadow] duration-200 hover:bg-blood-500 focus-visible:shadow-[0_0_0_3px_rgba(184,18,26,0.28)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text disabled:active:scale-100"
+              className="shine tap-target relative flex w-full items-center justify-center overflow-hidden bg-blood-700 px-6 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-ash-text transition-[background-color,transform,box-shadow] duration-200 hover:bg-blood-500 focus-visible:shadow-[0_0_0_3px_rgba(184,18,26,0.28)] active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-iron disabled:text-faint-text disabled:active:scale-100"
             >
               <span className="relative z-10">
                 {status === "sending" ? "Отправляем…" : "Забронировать место"}

@@ -40,7 +40,7 @@ export default function QuestCard({
         spotlightSize={420}
       >
       <div
-        className="relative flex h-full flex-col overflow-hidden border border-iron bg-smoke transition-all duration-500 hover:border-blood-700/60 hover:shadow-[0_0_50px_-12px_rgba(138,3,3,0.55)]"
+        className="relative flex h-full flex-col overflow-hidden border border-iron bg-smoke transition-[border-color,box-shadow] duration-500 hover:border-blood-700/60 hover:shadow-[0_0_50px_-12px_rgba(138,3,3,0.55)]"
         style={{ animationDelay: `${index * 60}ms` }}
       >
         {/* Подсветка по контуру у «хита»: карточка дышит, а не просто
