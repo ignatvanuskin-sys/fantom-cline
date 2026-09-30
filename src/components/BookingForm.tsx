@@ -228,6 +228,12 @@ function WhenPicker({
             </label>
           ))}
         </div>
+        {/* Слоты — это обычное расписание, а не онлайн-календарь со свободными
+            окнами. Без этой оговорки выбор времени читается как гарантия
+            свободного часа. */}
+        <p className="mt-3 text-[11px] leading-relaxed text-faint-text">
+          Время подтвердит администратор: слоты сверяются с расписанием вручную.
+        </p>
       </fieldset>
     </>
   );
@@ -290,6 +296,7 @@ function WhoPicker({
           </button>
           <input
             id="players"
+            name="players"
             type="number"
             inputMode="numeric"
             value={players}
@@ -326,6 +333,7 @@ function WhoPicker({
           </label>
           <input
             id="name"
+            name="name"
             type="text"
             value={name}
             onChange={(e) => onName(e.target.value)}
@@ -353,6 +361,7 @@ function WhoPicker({
           </label>
           <input
             id="phone"
+            name="phone"
             type="tel"
             inputMode="tel"
             value={phone}
@@ -397,6 +406,9 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
     "idle",
   );
   const [error, setError] = useState<string>("");
+  // Согласие на обработку персональных данных: без него заявку не принимает
+  // ни клиентская проверка, ни обработчик на сервере.
+  const [consent, setConsent] = useState(false);
 
   // Номер шага мастера. Актуален только на телефоне: на десктопе форма
   // показывается целиком и значение игнорируется.
@@ -440,7 +452,8 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
   const phoneValid = digits.length === 11 && digits.startsWith("7");
   const nameValid = name.trim().length >= 2;
   const canSubmit =
-    questId && date && time && nameValid && phoneValid && status !== "sending";
+    Boolean(questId && date && time && nameValid && phoneValid && consent) &&
+    status !== "sending";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -454,14 +467,24 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
       в первое проблемное поле — иначе на телефоне придётся искать
       ошибку глазами по всей форме.
     */
-    const problem = !nameValid ? "name" : !phoneValid ? "phone" : !time ? "time" : null;
+    const problem = !nameValid
+      ? "name"
+      : !phoneValid
+        ? "phone"
+        : !time
+          ? "time"
+          : !consent
+            ? "consent"
+            : null;
     if (problem) {
       const message =
         problem === "name"
           ? "Укажите имя — администратор перезвонит и подтвердит бронь."
           : problem === "phone"
             ? "Проверьте номер: нужно 11 цифр, начиная с 7."
-            : "Выберите время — от часа зависит, сколько мест осталось.";
+            : problem === "time"
+              ? "Выберите время — от часа зависит, сколько мест осталось."
+              : "Отметьте согласие на обработку данных — без него не сможем принять заявку.";
 
       const field =
         problem === "time"
@@ -497,6 +520,7 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
           players,
           name: name.trim(),
           phone,
+          consent,
         }),
       });
       if (!res.ok) throw new Error("request failed");
@@ -674,6 +698,11 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
   return (
     <form
       onSubmit={submit}
+      // method/action — страховка на случай, когда клиентский JS не загрузился:
+      // браузер отправит те же поля обычным POST'ом (данные уйдут в теле
+      // запроса, а не в адресную строку) и получит HTML-ответ.
+      method="post"
+      action="/api/booking"
       noValidate
       // overflow-hidden: горизонтальные ряды дат/слотов не должны
       // вылезать за рамку формы ни при какой ширине экрана
@@ -785,8 +814,38 @@ export default function BookingForm({ initialQuestId }: BookingFormProps) {
               ? "Осталось указать имя"
               : !phoneValid
                 ? "Осталось указать телефон"
-                : "Проверьте выбранные данные"}
+                : !consent
+                  ? "Осталось согласие на обработку данных"
+                  : "Проверьте выбранные данные"}
         </p>
+      )}
+
+      {/* Согласие на обработку данных. На телефоне показывается только на
+          последнем шаге: раньше спрашивать нечего. */}
+      {(!isMobile || isLast) && (
+        <div className="mt-6">
+          <label
+            htmlFor="consent"
+            className="flex cursor-pointer items-start gap-3 border border-iron bg-ash px-4 py-3.5"
+          >
+            <input
+              id="consent"
+              name="consent"
+              type="checkbox"
+              required
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              // accent-color задан инлайном: это единственная галочка на
+              // странице, ради неё не стоит заводить отдельный токен
+              className="mt-0.5 h-4 w-4 shrink-0"
+              style={{ accentColor: "#b8121a" }}
+            />
+            <span className="text-[12px] leading-relaxed text-dim-text">
+              Согласен на обработку персональных данных: имя и телефон нужны
+              администратору, чтобы подтвердить бронь.
+            </span>
+          </label>
+        </div>
       )}
 
       {/* ---------- Итог ----------

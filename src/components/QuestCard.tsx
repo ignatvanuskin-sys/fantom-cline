@@ -139,9 +139,12 @@ export default function QuestCard({
                 {quest.minPlayers}–{quest.maxPlayers}
               </dd>
             </div>
+            {/* Возраст — один, из данных комнаты. Раньше в подписи стоял
+                общий бейдж «16+», а рядом фактический допуск: на «Чердаке»
+                это читалось как «16+ и 12+ одновременно». */}
             <div>
               <dt className="text-[10px] uppercase tracking-[0.15em] text-faint-text">
-                16+
+                Возраст
               </dt>
               <dd className="mt-1 text-sm font-semibold text-ash-text">
                 {quest.ageMin}+

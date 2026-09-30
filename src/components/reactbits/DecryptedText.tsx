@@ -50,7 +50,11 @@ export default function DecryptedText({
   loop = false,
   onComplete,
 }: Props) {
-  const [output, setOutput] = useState("");
+  // Начальное значение — готовый текст. Пустая строка означала, что в серверной
+  // разметке описания нет вовсе: без JS (и до гидратации) первый экран
+  // оставался без текста, а поисковик не видел ни строчки. «Расшифровка»
+  // стартует позже и лишь временно подменяет символы.
+  const [output, setOutput] = useState(text);
   const [started, setStarted] = useState(false);
   const [done, setDone] = useState(false);
   // Таймеры рестарта (для loop) — в ref, иначе переменная используется

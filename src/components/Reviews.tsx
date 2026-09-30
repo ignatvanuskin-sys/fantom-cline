@@ -1,8 +1,12 @@
 import StarIcon from "@/components/horror/StarIcon";
-import { REVIEWS } from "@/data/quests";
+import { BUSINESS, REVIEWS } from "@/data/quests";
 import Reveal from "./Reveal";
 
-/** TODO: заменить плейсхолдеры на реальные отзывы из 2GIS / Instagram. */
+/**
+ * Отзывы с карточки 2ГИС (343 отзыва, рейтинг 5) — см. src/data/quests.ts.
+ * Перед публикацией сверить с клиентом: часть отзывов относится к кинотеатру
+ * KinoLand, а не к квесту, и вопрос о публикации текстов решает владелец.
+ */
 export default function Reviews() {
   return (
     <section
@@ -46,9 +50,16 @@ export default function Reviews() {
                       </span>
                     ))}
                   </div>
-                  <span className="text-[10px] uppercase tracking-[0.18em] text-faint-text">
+                  {/* Источник — ссылкой, а не просто подписью: цитату, которую
+                      нельзя проверить, читают как выдуманную. */}
+                  <a
+                    href={BUSINESS.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="-my-1 inline-flex min-h-11 items-center py-1 text-[10px] uppercase tracking-[0.18em] text-faint-text underline decoration-iron underline-offset-4 transition-colors hover:text-blood-300"
+                  >
                     {r.source}
-                  </span>
+                  </a>
                 </div>
 
                 <blockquote className="flex-1 text-sm leading-relaxed text-ash-text/85">
@@ -71,6 +82,17 @@ export default function Reviews() {
 
         <p className="mt-4 text-center text-[11px] uppercase tracking-[0.25em] text-faint-text sm:hidden">
           ← листайте →
+        </p>
+
+        <p className="mt-6 text-center">
+          <a
+            href={BUSINESS.mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center py-1 text-sm text-blood-300 underline-offset-4 hover:underline"
+          >
+            Все {BUSINESS.reviewCount} отзывов — в карточке 2ГИС
+          </a>
         </p>
       </div>
     </section>

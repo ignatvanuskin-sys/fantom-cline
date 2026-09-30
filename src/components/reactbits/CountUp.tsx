@@ -20,6 +20,7 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 type Props = {
   to: number;
@@ -48,6 +49,7 @@ export default function CountUp({
   onEnd,
 }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
+  const reduceMotion = usePrefersReducedMotion();
   const motionValue = useMotionValue(direction === "down" ? to : from);
 
   const damping = 20 + 40 * (1 / duration);
@@ -81,15 +83,27 @@ export default function CountUp({
     return separator ? formatted.replace(/[  ]/g, separator) : formatted;
   };
 
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.textContent = formatValue(direction === "down" ? to : from);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [from, to, direction]);
+  /*
+    Значение, которое попадает в серверную разметку.
+    Раньше <span> рендерился пустым, и число существовало только в JS: без
+    гидратации (и до срабатывания IntersectionObserver) в блоке статистики
+    стояли нули — при том что настоящие 394 оценки и 343 отзыва видны ниже на
+    той же странице. Теперь конечное значение есть в HTML сразу, а анимация
+    «накручивает» его до него же.
+  */
+  const startValue = direction === "down" ? to : from;
+  const endValue = direction === "down" ? from : to;
+  const staticText = formatValue(endValue);
 
   useEffect(() => {
-    if (isInView && startWhen) {
+    // При reduced-motion анимации нет — число сразу конечное.
+    if (reduceMotion || !ref.current) return;
+    ref.current.textContent = formatValue(startValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduceMotion, startValue, from, to, direction]);
+
+  useEffect(() => {
+    if (isInView && startWhen && !reduceMotion) {
       if (typeof onStart === "function") onStart();
 
       const timeoutId = setTimeout(
@@ -111,6 +125,7 @@ export default function CountUp({
   }, [
     isInView,
     startWhen,
+    reduceMotion,
     motionValue,
     direction,
     from,
@@ -122,6 +137,7 @@ export default function CountUp({
   ]);
 
   useEffect(() => {
+    if (reduceMotion) return;
     const unsubscribe = springValue.on("change", (latest: number) => {
       if (ref.current) {
         ref.current.textContent = formatValue(latest);
@@ -129,7 +145,13 @@ export default function CountUp({
     });
     return () => unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [springValue]);
+  }, [springValue, reduceMotion]);
 
-  return <span className={className} ref={ref} />;
+  // Конечное значение отдаём как содержимое: между рендерами строка не
+  // меняется, поэтому React её не трогает, а textContent обновляет анимация.
+  return (
+    <span className={className} ref={ref}>
+      {staticText}
+    </span>
+  );
 }

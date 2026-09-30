@@ -21,7 +21,6 @@ import { BUSINESS } from "@/data/quests";
  */
 export default function Hero() {
   const [flickerOn, setFlickerOn] = useState(false);
-  const [titleIn, setTitleIn] = useState(false);
   const [trail, setTrail] = useState<{ x: number; y: number }[]>([]);
   const heroRef = useRef<HTMLElement>(null);
 
@@ -30,12 +29,10 @@ export default function Hero() {
     const a = setTimeout(() => setFlickerOn(true), 120);
     const b = setTimeout(() => setFlickerOn(false), 320);
     const c = setTimeout(() => setFlickerOn(true), 460);
-    const d = setTimeout(() => setTitleIn(true), 700);
     return () => {
       clearTimeout(a);
       clearTimeout(b);
       clearTimeout(c);
-      clearTimeout(d);
     };
   }, []);
 
@@ -178,9 +175,7 @@ export default function Hero() {
           // font-glitch — единственное место, где уместна «сбойная»
           // гарнитура: строка короткая, и она и так дрожит по CSS.
           // Трекинг снижен с 0.35em: у этой гарнитуры свои широкие пробелы.
-          className={`mb-5 font-glitch text-[11px] uppercase tracking-[0.28em] text-dim-text transition-opacity duration-1000 sm:text-xs ${
-            titleIn ? "opacity-100" : "opacity-0"
-          }`}
+          className="hero-in mb-5 font-glitch text-[11px] uppercase tracking-[0.28em] text-dim-text sm:text-xs"
         >
           {/* React Bits: GlitchText — подпись «сбоит», как плохой сигнал */}
           <GlitchText
@@ -226,8 +221,8 @@ export default function Hero() {
 
         {/* Готический орнамент под логотипом: летучая мышь + розетка */}
         <div
-          className="mt-4 flex flex-col items-center gap-2 sm:mt-5"
-          style={{ opacity: titleIn ? 1 : 0, transition: "opacity 1s ease 0.4s" }}
+          className="hero-in mt-4 flex flex-col items-center gap-2 sm:mt-5"
+          style={{ animationDelay: "400ms" }}
           aria-hidden="true"
         >
           <GothicDivider className="py-0" />
@@ -241,10 +236,8 @@ export default function Hero() {
             Значения подобраны по замеру: 4 строки на мобильном, 3 на sm+.
             Компенсируем отступом кнопок ниже (mt-3 вместо mt-7 на мобильном). */}
         <p
-          className={`mt-5 min-h-[7rem] max-w-md text-balance text-base leading-relaxed text-ash-text/85 transition-opacity duration-1000 sm:mt-6 sm:min-h-[5.75rem] sm:text-lg ${
-            titleIn ? "opacity-100" : "opacity-0"
-          }`}
-          style={{ transitionDelay: "700ms" }}
+          className="hero-in mt-5 min-h-[7rem] max-w-md text-balance text-base leading-relaxed text-ash-text/85 sm:mt-6 sm:min-h-[5.75rem] sm:text-lg"
+          style={{ animationDelay: "700ms" }}
         >
           {/* React Bits: DecryptedText — текст «декодируется» из шума,
               будто вскрывают повреждённый файл изнутри квеста */}
@@ -257,10 +250,8 @@ export default function Hero() {
         </p>
 
         <div
-          className={`mt-3 flex w-full flex-col items-stretch gap-3 transition-opacity duration-1000 sm:mt-9 sm:w-auto sm:flex-row ${
-            titleIn ? "opacity-100" : "opacity-0"
-          }`}
-          style={{ transitionDelay: "900ms" }}
+          className="hero-in mt-3 flex w-full flex-col items-stretch gap-3 sm:mt-9 sm:w-auto sm:flex-row"
+          style={{ animationDelay: "900ms" }}
         >
           {/* React Bits: ClickSpark — из точки клика разлетаются искры,
               как от удара в запертую дверь */}
@@ -294,10 +285,8 @@ export default function Hero() {
             съедал экран, поэтому на мобильных он заметно меньше. */}
         <div
           aria-hidden="true"
-          className={`mt-9 flex flex-col items-center gap-2 transition-opacity duration-1000 sm:mt-16 ${
-            titleIn ? "opacity-100" : "opacity-0"
-          }`}
-          style={{ transitionDelay: "1200ms" }}
+          className="hero-in mt-9 flex flex-col items-center gap-2 sm:mt-16"
+          style={{ animationDelay: "1200ms" }}
         >
           <span className="text-[10px] uppercase tracking-[0.3em] text-faint-text">
             Листайте вниз

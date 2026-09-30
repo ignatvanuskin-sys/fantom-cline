@@ -39,19 +39,55 @@ export default function Booking() {
           <BookingForm />
         </Reveal>
 
-        <p className="mt-6 text-center text-xs text-faint-text">
-          Не нашли подходящее время?{" "}
-          <a
-            href={BUSINESS.instagramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            // py-1 + текст даёт тач-таргет ~44px: на телефоне мелкая
-            // ссылка не попадает под палец
-            className="-my-1 inline-flex min-h-11 items-center py-1 text-blood-300 underline-offset-4 hover:underline"
-          >
-            Напишите нам в Instagram
-          </a>
-        </p>
+        {/* Контакты рядом с формой: если человек не готов оставлять заявку или
+            сомневается, у него должен быть путь к живому администратору и к
+            проверяемым отзывам — а не только форма. */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-faint-text">
+            Не нашли подходящее время или есть вопросы?
+          </p>
+          <ul className="mt-1 flex flex-wrap items-center justify-center gap-x-6">
+            <li>
+              <a
+                href={`tel:${BUSINESS.phone.replace(/[^\d+]/g, "")}`}
+                // min-h-11 + py-1: мелкая ссылка не попадает под палец
+                className="-my-1 inline-flex min-h-11 items-center py-1 text-sm text-blood-300 underline-offset-4 hover:underline"
+              >
+                Позвонить {BUSINESS.phone}
+              </a>
+            </li>
+            <li>
+              <a
+                href={BUSINESS.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="-my-1 inline-flex min-h-11 items-center py-1 text-sm text-blood-300 underline-offset-4 hover:underline"
+              >
+                WhatsApp
+              </a>
+            </li>
+            <li>
+              <a
+                href={BUSINESS.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="-my-1 inline-flex min-h-11 items-center py-1 text-sm text-blood-300 underline-offset-4 hover:underline"
+              >
+                Instagram
+              </a>
+            </li>
+            <li>
+              <a
+                href={BUSINESS.mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="-my-1 inline-flex min-h-11 items-center py-1 text-sm text-blood-300 underline-offset-4 hover:underline"
+              >
+                Отзывы в 2ГИС
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <CrackDivider flip />
