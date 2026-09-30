@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { BLUR } from "@/data/blur";
 import { ShaderBackground } from "@/components/ui/gem-smoke-diamond";
 import ClickSpark from "@/components/reactbits/ClickSpark";
 import DecryptedText from "@/components/reactbits/DecryptedText";
@@ -107,6 +108,11 @@ export default function Hero() {
             src={HERO_SCENE.src}
             alt=""
             fill
+            // Размытое превью проявляется мгновенно и снимает «чёрную дыру»
+            // на месте кадра, пока тот декодируется (это самый крупный
+            // элемент первого экрана)
+            placeholder={BLUR[HERO_SCENE.src] ? "blur" : "empty"}
+            blurDataURL={BLUR[HERO_SCENE.src]}
             priority
             sizes="100vw"
             className="object-cover"

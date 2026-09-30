@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { BLUR } from "@/data/blur";
 import GlitchText from "@/components/reactbits/GlitchText";
 import { sfx } from "@/components/horror/SoundToggle";
 import { ROOM_SCENES } from "@/data/scenes";
@@ -78,6 +79,8 @@ export default function QuestModal({
             src={scene.src}
             alt={scene.alt}
             fill
+            placeholder={BLUR[scene.src] ? "blur" : "empty"}
+            blurDataURL={BLUR[scene.src]}
             priority
             sizes="(max-width: 768px) 100vw, 42rem"
             className="object-cover"

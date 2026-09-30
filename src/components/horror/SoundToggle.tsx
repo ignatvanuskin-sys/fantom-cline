@@ -104,7 +104,9 @@ export default function SoundToggle() {
       aria-pressed={enabled}
       aria-label={enabled ? "Выключить страшные звуки" : "Включить страшные звуки"}
       title={enabled ? "Звук включён · клавиша M" : "Звук выключен · клавиша M"}
-      className="inline-flex min-h-11 items-center gap-2 border border-iron px-3 py-2 text-[10px] uppercase tracking-[0.15em] text-dim-text transition-colors hover:border-blood-700 hover:text-ash-text"
+      // min-w-11: на телефоне подпись скрыта, оставался значок 41px по
+      // ширине — меньше минимальной тач-цели 44px
+      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 border border-iron px-3 py-2 text-[10px] uppercase tracking-[0.15em] text-dim-text transition-colors hover:border-blood-700 hover:text-ash-text sm:justify-start"
     >
       <svg
         width="15"

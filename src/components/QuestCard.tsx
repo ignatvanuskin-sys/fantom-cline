@@ -3,6 +3,7 @@
 import Image from "next/image";
 import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import { ROOM_SCENES } from "@/data/scenes";
+import { BLUR } from "@/data/blur";
 import type { Quest } from "@/data/quests";
 
 // Комнаты без обложки не бывает: подборка собрана для всех шести.
@@ -61,9 +62,15 @@ export default function QuestCard({
           {/* Блик под ещё не загруженным кадром */}
           <span aria-hidden="true" className="shimmer-layer" />
           <Image
+            // placeholder=blur: пока грузится кадр, на его месте уже виден он
+            // же, размытый. Без превью карточки 4–6 (они за кадром карусели
+            // и грузятся лениво) показывали пустое тёмное место — на свайпе
+            // это читалось как «картинки нет»
             src={cover.src}
             alt={cover.alt}
             fill
+            placeholder={BLUR[cover.src] ? "blur" : "empty"}
+            blurDataURL={BLUR[cover.src]}
             loading={index < 3 ? "eager" : "lazy"}
             sizes="(max-width: 640px) 78vw, (max-width: 1024px) 46vw, 31vw"
             className="object-cover transition-transform duration-700 group-hover:scale-[1.05]"

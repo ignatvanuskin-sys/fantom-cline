@@ -22,7 +22,7 @@ export default function Footer() {
               {BUSINESS.name}
             </p>
             <p className="mt-2 text-sm text-dim-text">
-              Хоррор-квест в {BUSINESS.city}
+              Хоррор-квест в {BUSINESS.cityIn}
             </p>
           </div>
 
