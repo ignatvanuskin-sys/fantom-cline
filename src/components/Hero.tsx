@@ -269,7 +269,10 @@ export default function Hero() {
               <a
                 href="#quests"
                 onClick={() => sfx("door")}
-                className="shine group tap-target relative flex flex-1 items-center justify-center overflow-hidden bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-[background-color,transform] duration-200 hover:bg-blood-500 active:scale-[0.97]"
+                // flex-1 только на телефоне (там кнопка во всю ширину колонки);
+                // на sm+ — flex-none и запрет переноса, иначе кнопка
+                // разваливалась на две строки внутри обёртки кромки
+                className="shine group tap-target relative flex flex-1 items-center justify-center overflow-hidden whitespace-nowrap bg-blood-700 px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-ash-text transition-[background-color,transform] duration-200 hover:bg-blood-500 active:scale-[0.97] sm:flex-none"
               >
                 <span className="relative z-10">Войти, если осмелишься</span>
                 {/* «проявление из тумана» при hover */}
